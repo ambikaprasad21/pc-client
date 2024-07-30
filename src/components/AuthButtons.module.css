@@ -1,0 +1,23 @@
+.authbtns {
+  cursor: pointer;
+  display: flex;
+  gap: 1rem;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.authbtns a {
+  text-decoration: none;
+  padding: 4px 6px;
+  border-radius: 3px;
+}
+
+.authbtns .login {
+  color: #3f8efc;
+  border: 2px solid #87bfff;
+}
+
+.authbtns .signup {
+  color: #ffffff;
+  background-color: #3f8efc;
+}

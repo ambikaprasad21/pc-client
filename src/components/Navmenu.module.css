@@ -1,0 +1,23 @@
+.nav-bar ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  font-size: 1.4rem;
+}
+
+.nav-bar a {
+  text-decoration: none;
+  padding: 4px 6px;
+}
+
+.nav-bar a:hover {
+  background-color: #3f8efc;
+  color: white;
+  border-radius: 9px;
+}
+
+/* .nav-bar a:global(.active) {
+  background-color: #1c5ef2;
+  color: #ffffff;
+  border-radius: 3px;
+} */

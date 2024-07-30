@@ -1,0 +1,159 @@
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700&display=swap");
+
+/* 
+
+Ingredients for a good looking websites.
+
+-- 01 Typography
+
+FONT SIZE SYSTEM (px)
+10 / 12 / 14 / 16 / 18 / 20 / 24 / 30 / 36 / 44 / 52 / 62 / 74 / 86 / 98
+
+-font-weight
+Default:400
+medium:500
+semi-bold:600
+bold:700
+
+-line-height
+Default : 1
+small: 1.05
+medium : 1.2
+Larger: 1.8
+paragraph default:1.6
+
+-letter spacing
+-0.5px
+0.75px
+
+-- 02 Colors
+
+-primary: #e67e22
+
+-tints: #fdf2e9, #f5cba7, #fae5d3, #eb984e
+-shades: #cf711f
+-Accents:
+-grey
+
+
+#888
+#767676(lightest grey allowed on #fff)
+#6f6f6f (lightest grey allowed on #fdf2e9)
+#555
+#333
+
+
+-- 05 Shadows
+
+ box-shadow: 0 2.4rem 4.8rem rgba(0, 0, 0, 0.075);
+
+-- 06 Border radius
+
+Default: 9px
+Medium: 11px
+
+-- 07 White space
+
+-SPACING SYSTEM (px)
+2 / 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 80 / 96 / 128
+
+*/
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  font-family: "Lato", sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424; */
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  font-size: 62.5%;
+  scroll-behavior: smooth;
+}
+
+.mouse {
+  cursor: pointer;
+}
+
+.auth-btn {
+  cursor: pointer;
+  padding: 1rem 0;
+  font-size: 1.6rem;
+  font-weight: 500;
+  background-color: #3f8efc;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+}
+
+.otp-btn {
+  cursor: pointer;
+  padding: 1rem 1.8rem;
+  font-size: 1.6rem;
+  font-weight: 500;
+  background-color: #3f8efc;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+}
+
+.auth-btn:hover {
+  background-color: #0b71ff;
+}
+
+.lato-thin {
+  font-family: "Lato", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.lato-light {
+  font-family: "Lato", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.lato-regular {
+  font-family: "Lato", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lato-bold {
+  font-family: "Lato", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 1.8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4578e6;
+  border-radius: 10px;
+  border: 3px solid #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}

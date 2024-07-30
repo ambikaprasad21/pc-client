@@ -1,0 +1,75 @@
+.bg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f7f7f7;
+}
+
+.container {
+  width: 40%;
+  padding: 2rem 3rem;
+  margin: 10rem 0;
+  background-color: #ffffff;
+  border-radius: 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.img-box {
+  text-align: center;
+}
+
+.img-box img {
+  width: 50%;
+}
+
+.container h1 {
+  font-size: 2.4rem;
+  letter-spacing: 0.8px;
+  margin-bottom: 1rem;
+}
+
+.container p {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 350;
+}
+
+.otp-input-container {
+  margin: 2rem 0;
+  display: flex;
+  justify-content: space-between;
+  width: 200px;
+}
+
+.otp-input {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  outline: 1px solid #3f8efc;
+  border-radius: 4px;
+  margin-right: 5px;
+}
+
+.otp-input:focus {
+  outline: 2px solid #1530fc;
+}
+
+.otp-input:last-child {
+  margin-right: 0;
+}
+
+.re-otp {
+  margin-top: 1.4rem;
+  font-weight: 500;
+  font-size: 1.4rem;
+  color: #3f8efc;
+  cursor: pointer;
+  border-bottom: 2px solid #3f8efc;
+  text-decoration: none;
+}

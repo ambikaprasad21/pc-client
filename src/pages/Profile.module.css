@@ -1,0 +1,156 @@
+.section {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.left {
+  display: flex;
+  padding: 1.8rem 1.4rem;
+
+  flex-direction: column;
+  gap: 1.4rem;
+  align-items: center;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+}
+
+.right {
+  flex: 2;
+}
+
+.name {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #636363;
+}
+.mail {
+  font-size: 1.6rem;
+  font-weight: 300;
+}
+
+.r-b {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.heading {
+  font-size: 1.8rem;
+}
+
+.bio-edit {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background-color: #f4f4f4;
+  padding: 1rem 1rem;
+  border-radius: 5px;
+}
+
+.bio-edit p {
+  font-size: 1.2rem;
+  word-spacing: 3px;
+  letter-spacing: 1px;
+}
+
+.skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.skill-tab {
+  width: fit-content;
+  align-self: flex-start;
+  padding: 5px 8px;
+  border: 2px solid black;
+  margin-right: 1rem;
+}
+
+.skill-pill {
+  background-color: #e0e0e0;
+  border-radius: 20px;
+  padding: 5px 10px;
+  margin: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.remove-btn {
+  background-color: #9f9f9f;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  /* padding: 5px; */
+  /* padding: 1px; */
+  width: 10px;
+  height: 10px;
+  border: none;
+  color: rgb(206, 206, 206);
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.skill-input {
+  border: none;
+  padding: 5px;
+  margin: 5px;
+  background-color: transparent;
+  outline: none;
+}
+
+.switch-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.switch-label {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.switch {
+  width: 5rem;
+  height: 2.5rem;
+  background-color: #ccc;
+  border-radius: 2.5rem;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.switch-on {
+  background-color: #056af8;
+}
+
+/* .switch-off {
+  background-color: #ccc;
+} */
+
+.switch-handle {
+  width: 2.1rem;
+  height: 2.1rem;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+}
+
+.switch-on .switch-handle {
+  transform: translateX(2.5rem);
+}
+
+.c-p {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.c-p-btn {
+  align-self: flex-end;
+}

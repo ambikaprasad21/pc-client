@@ -1,0 +1,18 @@
+.logo {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.logo-img {
+  text-decoration: none;
+  width: 3.5rem;
+}
+.img {
+  width: 100%;
+}
+
+.text {
+  font-size: 2rem;
+  color: #636363;
+}

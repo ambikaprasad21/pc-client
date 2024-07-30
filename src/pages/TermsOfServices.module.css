@@ -1,0 +1,33 @@
+.data {
+  padding: 4rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+}
+
+.h-t {
+  align-items: flex-start;
+  padding: 2rem 2rem;
+  background-color: #eef2ff;
+}
+
+.agreement {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.agreement p {
+  font-size: 1.6rem;
+  color: #404040;
+}
+
+.ul-padding {
+  padding-left: 2rem;
+}
+
+.p-item h2 {
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
