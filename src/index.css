@@ -157,3 +157,15 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #555;
 }
+
+.ql-toolbar.ql-snow {
+  background-color: #f0f0f0;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.ql-container {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  overflow: hidden;
+}

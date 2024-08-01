@@ -97,6 +97,10 @@ const StyledDiv = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2rem;
+
+  h2 {
+    font-size: 2.4rem;
+  }
 `;
 
 const ProjectItems = styled.div`
@@ -180,6 +184,7 @@ function Projects() {
 
   return (
     <StyledDiv>
+      <h2>Project Task Assigned</h2>
       <ProjectItems>
         {projects.map((el) => (
           <ProjectItem key={el.id}>

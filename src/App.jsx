@@ -25,6 +25,7 @@ import Info from "./ui/Info";
 import Assets from "./ui/Assets";
 import TaskMembers from "./ui/TaskMembers";
 import Comments from "./ui/Comments";
+import AnalyticsList from "./pages/AnalyticsList";
 
 function App() {
   return (
@@ -44,7 +45,8 @@ function App() {
           </Route>
           <Route path="members" element={<Members />} />
           <Route path="projects" element={<Projects />} />
-          <Route path="analytics" element={<Analytics />} />
+          <Route path="analytics" element={<AnalyticsList />} />
+          <Route path="analytics/:pid" element={<Analytics />} />
           <Route path="trash" element={<Trash />} />
           <Route path="profile" element={<Profile />} />
           <Route path="messages" element={<Messages />} />

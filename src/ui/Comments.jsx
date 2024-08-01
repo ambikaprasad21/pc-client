@@ -5,6 +5,10 @@ import Avatar from "../components/Avatar";
 import Row from "./../ui/Row";
 import styled from "styled-components";
 import { MdVerifiedUser } from "react-icons/md";
+import Editor from "../components/Editor";
+import Button from "./Button";
+// import { Editor, EditorState } from "draft-js";
+// import "draft-js/dist/Draft.css";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -64,13 +68,24 @@ const NoComments = styled.div`
   }
 `;
 
+const CommBtn = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`;
+
 const CommentBox = styled.div`
-  flex: 1;
+  width: 30rem;
+  height: 20rem;
 `;
 
 function Comments() {
   const { tid } = useParams();
   const [comments, setComments] = useState([]);
+  const [typeComment, setTypeComment] = useState("");
+  // const [editorState, setEditorState] = useState(() =>
+  //   EditorState.createEmpty()
+  // );
 
   useEffect(() => {
     const filteredComments = commentsData.filter((el) => el.taskId === +tid);
@@ -119,7 +134,24 @@ function Comments() {
         </NoComments>
       )}
 
-      <CommentBox>Comment box</CommentBox>
+      <CommBtn>
+        <CommentBox>
+          <Editor
+            text={typeComment}
+            setText={setTypeComment}
+            textareaplaceholder={"type here..."}
+          />
+        </CommentBox>
+        <div>
+          <Button
+            variation={"secondary"}
+            size="medium"
+            onClick={() => console.log(typeComment)}
+          >
+            Submit
+          </Button>
+        </div>
+      </CommBtn>
     </StyledDiv>
   );
 }
