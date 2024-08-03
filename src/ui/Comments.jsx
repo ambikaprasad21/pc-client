@@ -7,6 +7,8 @@ import styled from "styled-components";
 import { MdVerifiedUser } from "react-icons/md";
 import Editor from "../components/Editor";
 import Button from "./Button";
+import LazyImage from "./../utility/LazyImage";
+
 // import { Editor, EditorState } from "draft-js";
 // import "draft-js/dist/Draft.css";
 
@@ -60,7 +62,13 @@ const NoComments = styled.div`
   align-items: center;
   justify-content: center;
   gap: 2rem;
+  span {
+    display: flex !important ;
+    justify-content: center;
+  }
+
   img {
+    /* align-self: center; */
     width: 50%;
   }
   p {
@@ -126,9 +134,9 @@ function Comments() {
 
       {comments.length === 0 && (
         <NoComments>
-          <img
-            src="/images/nocomments.jpg"
-            alt="there are no comments. Make a comment illustration"
+          <LazyImage
+            src={"/images/nocomments.jpg"}
+            alt={"there are no comments. Make a comment illustration"}
           />
           <p>Join the conversation! Be the first to comment on this task.</p>
         </NoComments>

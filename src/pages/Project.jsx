@@ -7,6 +7,10 @@ import styled from "styled-components";
 import Row from "../ui/Row";
 import { BsCloudPlusFill } from "react-icons/bs";
 import { MdDelete } from "react-icons/md";
+import Modal from "../ui/Modal";
+import CreateTask from "../modalwindows/CreateTask";
+import UploadFile from "../modalwindows/UploadFile";
+import ConfirmDelete from "../modalwindows/ConfirmDelete";
 
 const StyledDiv = styled.div`
   /* max-width: 120rem; */
@@ -154,9 +158,16 @@ function Project() {
         >
           All task
         </Button>
-        <Button variation="secondary" size="medium">
-          + Add task
-        </Button>
+        <Modal>
+          <Modal.Open opens="upload-pp">
+            <Button variation="secondary" size="medium">
+              + Add task
+            </Button>
+          </Modal.Open>
+          <Modal.Window name={"upload-pp"}>
+            <CreateTask />
+          </Modal.Window>
+        </Modal>
       </TopBtn>
       {project && (
         <Row>
@@ -182,10 +193,17 @@ function Project() {
                     <img src="/images/image-icon.png" alt="icon for image" />
                     <div>Images</div>
                   </TC>
-                  <IconContainer>
-                    <StyledBsCloudPlusFill size={"2rem"} color="blue" />
-                    <HoverText>Upload file</HoverText>
-                  </IconContainer>
+                  <Modal>
+                    <Modal.Open opens="upload-project-attachment">
+                      <IconContainer>
+                        <StyledBsCloudPlusFill size={"2rem"} color="blue" />
+                        <HoverText>Upload file</HoverText>
+                      </IconContainer>
+                    </Modal.Open>
+                    <Modal.Window name={"upload-project-attachment"}>
+                      <UploadFile />
+                    </Modal.Window>
+                  </Modal>
                 </TableHead>
                 {project.attachments["images"].map((img, index) => (
                   <TableData key={index}>
@@ -196,7 +214,18 @@ function Project() {
                       <Img src={img} />
                       <div>{img}</div>
                     </StyledLink>
-                    <MdDelete color="red" size={"2rem"} cursor={"pointer"} />
+                    <Modal>
+                      <Modal.Open opens="delete-project-attachment">
+                        <MdDelete
+                          color="red"
+                          size={"2rem"}
+                          cursor={"pointer"}
+                        />
+                      </Modal.Open>
+                      <Modal.Window name={"delete-project-attachment"}>
+                        <ConfirmDelete />
+                      </Modal.Window>
+                    </Modal>
                   </TableData>
                 ))}
               </div>
@@ -207,10 +236,17 @@ function Project() {
                     <img src="/images/pdf-icon.png" alt="icon for pdfs" />
                     <div>Pdfs</div>
                   </TC>
-                  <IconContainer>
-                    <StyledBsCloudPlusFill size={"2rem"} color="blue" />
-                    <HoverText>Upload file</HoverText>
-                  </IconContainer>
+                  <Modal>
+                    <Modal.Open opens="upload-project-attachment">
+                      <IconContainer>
+                        <StyledBsCloudPlusFill size={"2rem"} color="blue" />
+                        <HoverText>Upload file</HoverText>
+                      </IconContainer>
+                    </Modal.Open>
+                    <Modal.Window name={"upload-project-attachment"}>
+                      <UploadFile />
+                    </Modal.Window>
+                  </Modal>
                 </TableHead>
                 {project.attachments.pdfs.map((pdf, index) => (
                   <TableData key={index}>
@@ -222,7 +258,18 @@ function Project() {
                       <div>name of pdf</div>
                     </StyledLink>
 
-                    <MdDelete color="red" size={"2rem"} cursor={"pointer"} />
+                    <Modal>
+                      <Modal.Open opens="delete-project-attachment">
+                        <MdDelete
+                          color="red"
+                          size={"2rem"}
+                          cursor={"pointer"}
+                        />
+                      </Modal.Open>
+                      <Modal.Window name={"delete-project-attachment"}>
+                        <ConfirmDelete />
+                      </Modal.Window>
+                    </Modal>
                   </TableData>
                 ))}
               </div>

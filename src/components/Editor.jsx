@@ -12,7 +12,7 @@ const module = {
   toolbar: toolbarOptions,
 };
 
-function Editor({ text, setText, textareaplaceholder }) {
+function Editor({ text, setText, textareaplaceholder = "" }) {
   const quillStyle = {
     height: "70%",
   };

@@ -5,6 +5,8 @@ import Avatar from "../components/Avatar";
 import styled from "styled-components";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Row from "./Row";
+import Modal from "./Modal";
+import MessageMember from "../modalwindows/MessageMember";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -166,7 +168,15 @@ function TaskMembers() {
             >
               <BsThreeDotsVertical size={"1.4rem"} />
               <Menu show={showMenu === member.id}>
-                <MenuItem>Message</MenuItem>
+                <Modal>
+                  <Modal.Open opens="upload-pp">
+                    <MenuItem>Message</MenuItem>
+                  </Modal.Open>
+                  <Modal.Window name={"upload-pp"}>
+                    <MessageMember />
+                  </Modal.Window>
+                </Modal>
+
                 <MenuItem>Delete</MenuItem>
               </Menu>
             </IconWrapper>

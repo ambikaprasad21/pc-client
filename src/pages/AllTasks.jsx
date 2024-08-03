@@ -189,7 +189,8 @@ function AllTasks() {
   const [showMenu, setShowMenu] = useState(null);
   const menuRef = useRef(null);
 
-  const toggleMenu = (id) => {
+  const toggleMenu = (id, e) => {
+    e.stopPropagation();
     if (showMenu === id) {
       setShowMenu(null);
     } else {
@@ -274,7 +275,10 @@ function AllTasks() {
               <Priority variation={task.priority}>
                 {task.priority.toUpperCase()}
               </Priority>
-              <IconWrapper onClick={() => toggleMenu(task.id)} ref={menuRef}>
+              <IconWrapper
+                onClick={(e) => toggleMenu(task.id, e)}
+                ref={menuRef}
+              >
                 <BsThreeDotsVertical />
                 <Menu show={showMenu === task.id}>
                   <MenuItem>Edit</MenuItem>

@@ -1,7 +1,8 @@
 export default {
-  completed: 30,
-  pending: 20,
-  "in-progress": 50,
+  totalTask: 10,
+  completed: 3,
+  pending: 2,
+  "in-progress": 5,
   lowCount: 1,
   mediumCount: 2,
   highCount: 2,

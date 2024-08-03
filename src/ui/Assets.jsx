@@ -6,6 +6,9 @@ import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 import taskData from "../data/taskData";
+import Modal from "./Modal";
+import UploadFile from "../modalwindows/UploadFile";
+import ConfirmDelete from "../modalwindows/ConfirmDelete";
 
 const TableHead = styled.div`
   display: flex;
@@ -108,10 +111,17 @@ function Assets() {
                 <img src="/images/image-icon.png" alt="icon for image" />
                 <div>Images</div>
               </TC>
-              <IconContainer>
-                <StyledBsCloudPlusFill size={"2rem"} color="blue" />
-                <HoverText>Upload file</HoverText>
-              </IconContainer>
+              <Modal>
+                <Modal.Open opens="upload-project-attachment">
+                  <IconContainer>
+                    <StyledBsCloudPlusFill size={"2rem"} color="blue" />
+                    <HoverText>Upload file</HoverText>
+                  </IconContainer>
+                </Modal.Open>
+                <Modal.Window name={"upload-project-attachment"}>
+                  <UploadFile />
+                </Modal.Window>
+              </Modal>
             </TableHead>
             {task.attachments["images"].map((img, index) => (
               <TableData key={index}>
@@ -122,7 +132,14 @@ function Assets() {
                   <Img src={img} />
                   <div>{img}</div>
                 </StyledLink>
-                <MdDelete color="red" size={"2rem"} cursor={"pointer"} />
+                <Modal>
+                  <Modal.Open opens="delete-project-attachment">
+                    <MdDelete color="red" size={"2rem"} cursor={"pointer"} />
+                  </Modal.Open>
+                  <Modal.Window name={"delete-project-attachment"}>
+                    <ConfirmDelete />
+                  </Modal.Window>
+                </Modal>
               </TableData>
             ))}
           </div>
@@ -132,10 +149,17 @@ function Assets() {
                 <img src="/images/pdf-icon.png" alt="icon for pdfs" />
                 <div>Pdfs</div>
               </TC>
-              <IconContainer>
-                <StyledBsCloudPlusFill size={"2rem"} color="blue" />
-                <HoverText>Upload file</HoverText>
-              </IconContainer>
+              <Modal>
+                <Modal.Open opens="upload-project-attachment">
+                  <IconContainer>
+                    <StyledBsCloudPlusFill size={"2rem"} color="blue" />
+                    <HoverText>Upload file</HoverText>
+                  </IconContainer>
+                </Modal.Open>
+                <Modal.Window name={"upload-project-attachment"}>
+                  <UploadFile />
+                </Modal.Window>
+              </Modal>
             </TableHead>
             {task.attachments.pdfs.map((pdf, index) => (
               <TableData key={index}>
@@ -147,7 +171,14 @@ function Assets() {
                   <div>name of pdf</div>
                 </StyledLink>
 
-                <MdDelete color="red" size={"2rem"} cursor={"pointer"} />
+                <Modal>
+                  <Modal.Open opens="delete-project-attachment">
+                    <MdDelete color="red" size={"2rem"} cursor={"pointer"} />
+                  </Modal.Open>
+                  <Modal.Window name={"delete-project-attachment"}>
+                    <ConfirmDelete />
+                  </Modal.Window>
+                </Modal>
               </TableData>
             ))}
           </div>

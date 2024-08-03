@@ -77,9 +77,9 @@ function Analytics() {
       {
         label: "Task Progress",
         data: [
-          reportData.pending,
-          reportData["in-progress"],
-          reportData.completed,
+          (reportData.pending / reportData.totalTask) * 100,
+          (reportData["in-progress"] / reportData.totalTask) * 100,
+          (reportData.completed / reportData.totalTask) * 100,
         ],
         backgroundColor: ["#E14141", "#3F8EFC", "#53FF16"],
         hoverOffset: 4,
@@ -99,7 +99,7 @@ function Analytics() {
           label: function (tooltipItem) {
             const label = doughnutData.labels[tooltipItem.dataIndex];
             const value = doughnutData.datasets[0].data[tooltipItem.dataIndex];
-            return `${label}: ${value}%`;
+            return `Task ${label}: ${value / reportData.totalTask}`;
           },
         },
       },
@@ -227,15 +227,14 @@ function Analytics() {
     <Row gap="5rem">
       <HeadBtn>
         <Heading>{projectName}</Heading>
-        <div>
-          <Button
-            variation="secondary"
-            size="small"
-            onClick={() => onGeneratePdf()}
-          >
-            Download report
-          </Button>
-        </div>
+
+        <Button
+          variation="secondary"
+          size="medium"
+          onClick={() => onGeneratePdf()}
+        >
+          Download report
+        </Button>
       </HeadBtn>
       <Container ref={containerRef}>
         <Container1 style={{ height: "400px" }}>
@@ -246,15 +245,22 @@ function Analytics() {
           <DoughnutLegend>
             <DLI>
               <span style={{ backgroundColor: "#53FF16" }}></span>
-              <div>{reportData.completed}% completed</div>
+              <div>
+                {(reportData.completed / reportData.totalTask) * 100}% completed
+              </div>
             </DLI>
             <DLI>
               <span style={{ backgroundColor: "#3F8EFC" }}></span>
-              <div>{reportData["in-progress"]}% progress</div>
+              <div>
+                {(reportData["in-progress"] / reportData.totalTask) * 100}%
+                progress
+              </div>
             </DLI>
             <DLI>
               <span style={{ backgroundColor: "#E14141" }}></span>
-              <div>{reportData["pending"]}% pending</div>
+              <div>
+                {(reportData.pending / reportData.totalTask) * 100}% pending
+              </div>
             </DLI>
           </DoughnutLegend>
         </Container1>

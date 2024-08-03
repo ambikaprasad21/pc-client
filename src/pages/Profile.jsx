@@ -8,6 +8,8 @@ import styles from "./Profile.module.css";
 
 import { MdCreate } from "react-icons/md";
 import { Textarea } from "../ui/TextArea";
+import Modal from "../ui/Modal";
+import ChangePP from "../ui/ChangePP";
 
 const data = {
   bio: "Headless UI does not strictly require Tailwind CSS to function. However, Headless UI components are designed to integrate seamlessly with Tailwind CSS, making it easier to style and customize them. If you choose to use Headless UI without Tailwind CSS, you'll need to provide your own styles.",
@@ -30,6 +32,7 @@ const data = {
 };
 
 function Profile() {
+  // const [isModalOpen, setIsModalOpen] = useState(false);
   const [bio, setBio] = useState(data.bio);
   const [editBio, setEditBio] = useState(false);
   const [editSkills, setEditSkills] = useState(false);
@@ -54,9 +57,24 @@ function Profile() {
         <Avatar src={"/images/z.jpg"} size={"large"} name={"Jessica Doe"} />
         <p className={styles.name}>Jessica Doe</p>
         <p className={styles.mail}>jessicadoe123@gmail.com</p>
-        <Button size={"medium"} variation={"secondary"}>
+        {/* <Button
+          size={"medium"}
+          variation={"secondary"}
+          onClick={() => setIsModalOpen((show) => !show)}
+        >
           Upload profile picture
         </Button>
+        {isModalOpen && <Modal />} */}
+        <Modal>
+          <Modal.Open opens="upload-pp">
+            <Button size={"medium"} variation={"secondary"}>
+              Upload profile picture
+            </Button>
+          </Modal.Open>
+          <Modal.Window name={"upload-pp"}>
+            <ChangePP />
+          </Modal.Window>
+        </Modal>
       </div>
 
       <Row type={"vertical"} className={styles.right}>

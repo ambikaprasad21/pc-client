@@ -7,6 +7,9 @@ import Progress from "../ui/Progress";
 import { Link, useNavigate } from "react-router-dom";
 
 import projectData from "./../data/projectData";
+import Modal from "../ui/Modal";
+import CreateProject from "../modalwindows/CreateProject";
+import EditProject from "./../modalwindows/EditProject";
 
 const StyledDiv = styled.div`
   max-width: 120rem;
@@ -16,7 +19,7 @@ const StyledDiv = styled.div`
   gap: 2rem;
 `;
 
-const CreateProject = styled.div`
+const StyledCreateProject = styled.div`
   align-self: flex-end;
 `;
 
@@ -164,11 +167,18 @@ function MyProjects() {
 
   return (
     <StyledDiv>
-      <CreateProject>
-        <Button size="medium" variation="secondary">
-          + Create project
-        </Button>
-      </CreateProject>
+      <StyledCreateProject>
+        <Modal>
+          <Modal.Open opens="create-project">
+            <Button size="medium" variation="secondary">
+              + Create project
+            </Button>
+          </Modal.Open>
+          <Modal.Window name={"create-project"}>
+            <CreateProject />
+          </Modal.Window>
+        </Modal>
+      </StyledCreateProject>
       <ProjectItems>
         {projects.map((el) => (
           <ProjectItem
@@ -184,7 +194,14 @@ function MyProjects() {
                 <BsThreeDotsVertical />
                 <Menu show={showMenu === el.id}>
                   <MenuItem>Move to trash</MenuItem>
-                  <MenuItem>Edit project</MenuItem>
+                  <Modal>
+                    <Modal.Open opens="edit-project">
+                      <MenuItem>Edit project</MenuItem>
+                    </Modal.Open>
+                    <Modal.Window name={"edit-project"}>
+                      <EditProject />
+                    </Modal.Window>
+                  </Modal>
                 </Menu>
               </IconWrapper>
             </Title>

@@ -9,6 +9,10 @@ import Pagination from "../components/Pagination";
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { PAGE_SIZE } from "../utility/constant";
+import Modal from "../ui/Modal";
+import AddMember from "../modalwindows/AddMember";
+import EditMember from "../modalwindows/EditMember";
+import ConfirmDelete from "../modalwindows/ConfirmDelete";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -16,7 +20,7 @@ const StyledDiv = styled.div`
   gap: 4rem;
 `;
 
-const AddMember = styled.div`
+const StyledAddMember = styled.div`
   align-self: flex-end;
 `;
 
@@ -100,11 +104,18 @@ function Members() {
   }, [page]);
   return (
     <StyledDiv>
-      <AddMember>
-        <Button variation="secondary" size="medium">
-          + Add member
-        </Button>
-      </AddMember>
+      <StyledAddMember>
+        <Modal>
+          <Modal.Open opens="add-member">
+            <Button variation="secondary" size="medium">
+              + Add member
+            </Button>
+          </Modal.Open>
+          <Modal.Window name={"add-member"}>
+            <AddMember />
+          </Modal.Window>
+        </Modal>
+      </StyledAddMember>
       <Row gap="3rem">
         <TopDiv>
           <h2>All members</h2>
@@ -140,17 +151,33 @@ function Members() {
                 <div>{member.email}</div>
                 <div>{member.role}</div>
                 <div>
-                  <FaPencilAlt
-                    color="#3F8EFC"
-                    size={"1.6rem"}
-                    cursor={"pointer"}
-                  />
+                  <Modal>
+                    <Modal.Open opens="upload-pp">
+                      <FaPencilAlt
+                        color="#3F8EFC"
+                        size={"1.6rem"}
+                        cursor={"pointer"}
+                      />
+                    </Modal.Open>
+                    <Modal.Window name={"upload-pp"}>
+                      <EditMember />
+                    </Modal.Window>
+                  </Modal>
+
                   <span style={{ padding: "0 1rem" }}></span>
-                  <FaTrashAlt
-                    color="#D70000"
-                    size={"1.6rem"}
-                    cursor="pointer"
-                  />
+
+                  <Modal>
+                    <Modal.Open opens="upload-pp">
+                      <FaTrashAlt
+                        color="#D70000"
+                        size={"1.6rem"}
+                        cursor="pointer"
+                      />
+                    </Modal.Open>
+                    <Modal.Window name={"upload-pp"}>
+                      <ConfirmDelete />
+                    </Modal.Window>
+                  </Modal>
                 </div>
               </TableData>
             ))}
