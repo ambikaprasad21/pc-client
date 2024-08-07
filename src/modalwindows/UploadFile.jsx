@@ -25,7 +25,7 @@ const File = styled.div`
   }
 `;
 
-function UploadFile({ fileType }) {
+function UploadFile({ fileType, onCloseModal }) {
   const {
     register,
     handleSubmit,
@@ -124,7 +124,12 @@ function UploadFile({ fileType }) {
         </div>
 
         <div>
-          <Button variation="primary" size="medium" type="reset">
+          <Button
+            variation="primary"
+            size="medium"
+            type="reset"
+            onClick={() => onCloseModal()}
+          >
             Cancel
           </Button>
           <Button variation="secondary" size="medium">

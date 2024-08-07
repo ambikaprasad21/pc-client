@@ -1,9 +1,83 @@
-import { Suspense } from "react";
+import { Suspense, useContext, useEffect, useRef, useState } from "react";
 import styles from "./Login.module.css";
 import LazyImage from "../utility/LazyImage";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import Row from "../ui/Row";
+import styled from "styled-components";
+import toast from "react-hot-toast";
+import { API, APIHEADER } from "../utility/constant";
+import { UserContext } from "../context/UserContext";
+import SpinnerSm from "../ui/SpinnerSm";
+
+const Error = styled.span`
+  font-size: 1rem;
+  padding: 0 5px;
+  color: #d71e1e;
+`;
 
 function Login() {
+  const [loader, setLoader] = useState(false);
+  const navigate = useNavigate();
+  const { register, handleSubmit, formState, watch } = useForm();
+  const { errors } = formState;
+  const { setUser } = useContext(UserContext);
+
+  const isDirty = useRef(false);
+
+  const watchFields = watch();
+
+  useEffect(() => {
+    isDirty.current = true;
+  }, [watchFields]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (isDirty.current) {
+        event.preventDefault();
+        event.returnValue =
+          "You have unsaved changes. Do you really want to leave?";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  async function onSubmit(data) {
+    try {
+      setLoader(true);
+      const res = await fetch(`${API}/user/login`, {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: APIHEADER,
+      });
+
+      if (res.status === 200) {
+        const data = await res.json();
+
+        toast.success("Logged in successfully");
+        setUser(data.data);
+        localStorage.setItem("prozverify", data.token);
+        navigate("/dashboard");
+      } else {
+        const data = await res.json();
+        toast.error(data.message);
+      }
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoader(false);
+    }
+    // console.log(data);
+  }
+
+  function onError(errors) {
+    console.log(errors);
+  }
   return (
     <div className={styles["bg"]}>
       <div className={styles.container}>
@@ -22,7 +96,10 @@ function Login() {
               SIGN UP
             </Link>
           </div>
-          <div className={styles["bottom-c"]}>
+          <form
+            className={styles["bottom-c"]}
+            onSubmit={handleSubmit(onSubmit, onError)}
+          >
             <div className={styles["w-m"]}>
               <p>Welcome Back!</p>
               <p className={styles["w-m-1"]}>
@@ -31,16 +108,42 @@ function Login() {
             </div>
             <div className={styles["c-fp"]}>
               <div className={styles["d-c"]}>
-                <input type="text" placeholder="Email" />
-                <input type="password" placeholder="Password" />
+                <Row gap="5px">
+                  <input
+                    type="text"
+                    placeholder="Email"
+                    id="email"
+                    {...register("email", {
+                      required: "This field is required.",
+                    })}
+                  />
+                  {errors?.email?.message && (
+                    <Error>{errors.email.message}</Error>
+                  )}
+                </Row>
+                <Row gap="5px">
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    id="password"
+                    {...register("password", {
+                      required: "This field is required.",
+                    })}
+                  />
+                  {errors?.password?.message && (
+                    <Error>{errors.password.message}</Error>
+                  )}
+                </Row>
               </div>
               <Link to={"/auth/forgot-password"} className={styles.conditions}>
                 Forgot password
               </Link>
             </div>
 
-            <button className="auth-btn">Sign in</button>
-          </div>
+            <button className="auth-btn">
+              {loader ? <SpinnerSm /> : "Sign in"}
+            </button>
+          </form>
         </div>
       </div>
     </div>

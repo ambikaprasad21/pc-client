@@ -67,7 +67,6 @@
 .bottom-c {
   display: flex;
   flex-direction: column;
-
   gap: 2rem;
   padding-bottom: 4rem;
 }
@@ -91,20 +90,21 @@
 
 .fn-ln {
   display: flex;
+  align-items: flex-start;
   gap: 2rem;
 }
 
 .d-c input {
   border: 2px solid #e3e7eb;
   background-color: #f8f9fa;
-  color: #b7babf;
+  color: #000000;
   padding: 1rem 1rem;
   border-radius: 5px;
 }
 
 .d-c input:focus {
   outline: 2px solid #afcbe8;
-  color: #636363;
+  color: #000;
 }
 
 .conditions {

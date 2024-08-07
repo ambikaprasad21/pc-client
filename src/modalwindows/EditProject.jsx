@@ -5,7 +5,7 @@ import { FaDiceD6 } from "react-icons/fa";
 import { Textarea } from "../ui/TextArea";
 import Input from "../ui/Input";
 
-function EditProject() {
+function EditProject({ onCloseModal }) {
   const { register, handleSubmit } = useForm();
 
   function onSubmit(data) {
@@ -70,7 +70,12 @@ function EditProject() {
         </Row>
 
         <div>
-          <Button variation="primary" size="medium" type="reset">
+          <Button
+            variation="primary"
+            size="medium"
+            type="reset"
+            onClick={() => onCloseModal()}
+          >
             Cancel
           </Button>
           <Button variation="secondary" size="medium">

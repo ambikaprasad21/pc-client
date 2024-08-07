@@ -28,7 +28,7 @@ function AppHeader() {
       <HeadOptions>
         <MessageIcon newMessages={4} />
         <NotifiIcon newNotifi={4} />
-        <Link to={"profile"}>
+        <Link to={"profile"} title="User profile">
           <Avatar src={"/images/z.jpg"} name={"Test User"} size={"small"} />
         </Link>
       </HeadOptions>
@@ -38,7 +38,11 @@ function AppHeader() {
 
 const MessageIcon = ({ newMessages }) => {
   return (
-    <Link to={"/messages"} className={styles["message-icon-container"]}>
+    <Link
+      to={"/messages"}
+      className={styles["message-icon-container"]}
+      title="messages"
+    >
       <MdChat size="2.4rem" color="gray" />
       {newMessages > 0 && <span className={styles.badge}>{newMessages}</span>}
     </Link>
@@ -47,7 +51,11 @@ const MessageIcon = ({ newMessages }) => {
 
 const NotifiIcon = ({ newNotifi }) => {
   return (
-    <Link to={"/notifications"} className={styles["message-icon-container"]}>
+    <Link
+      to={"/notifications"}
+      className={styles["message-icon-container"]}
+      title="notifications"
+    >
       <MdNotifications size="2.4rem" color="gray" />
       {newNotifi > 0 && <span className={styles.badge}>{newNotifi}</span>}
     </Link>

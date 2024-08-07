@@ -2,7 +2,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import Row from "../ui/Row";
 import Button from "../ui/Button";
 
-function ConfirmDelete() {
+function ConfirmDelete({ onCloseModal }) {
   return (
     <div
       style={{
@@ -42,7 +42,11 @@ function ConfirmDelete() {
       </Row>
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <div>
-          <Button variation="primary" size="medium">
+          <Button
+            variation="primary"
+            size="medium"
+            onClick={() => onCloseModal()}
+          >
             Cancel
           </Button>
           <Button

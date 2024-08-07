@@ -2,8 +2,12 @@
 import { Link as ScrollLink } from "react-scroll";
 import { Link, NavLink } from "react-router-dom";
 import styles from "./Navmenu.module.css";
+import { useContext, useEffect } from "react";
+import { UserContext } from "../context/UserContext";
 
 function Navmenu() {
+  const { user } = useContext(UserContext);
+  const email = user?.email;
   return (
     <nav className={styles["nav-bar"]}>
       <ul>
@@ -29,6 +33,13 @@ function Navmenu() {
             Pricing
           </ScrollLink>
         </li>
+        {email && (
+          <li>
+            <NavLink to="/dashboard" className="mouse">
+              Dashboard
+            </NavLink>
+          </li>
+        )}
       </ul>
     </nav>
   );

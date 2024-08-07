@@ -26,7 +26,7 @@ const File = styled.div`
   }
 `;
 
-function CreateProject() {
+function CreateProject({ onCloseModal }) {
   const {
     register,
     handleSubmit,
@@ -201,7 +201,12 @@ function CreateProject() {
         <div
           style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}
         >
-          <Button variation="primary" size="medium" type="reset">
+          <Button
+            variation="primary"
+            size="medium"
+            type="reset"
+            onClick={() => onCloseModal()}
+          >
             Cancel
           </Button>
           <Button variation="secondary" size="medium">

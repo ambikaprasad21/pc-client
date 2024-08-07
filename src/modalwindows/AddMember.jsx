@@ -4,7 +4,7 @@ import Row from "../ui/Row";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 
-function AddMember() {
+function AddMember({onCloseModal}) {
   const { register, handleSubmit, formState } = useForm();
 
   const { errors } = formState;
@@ -103,7 +103,7 @@ function AddMember() {
         <div
           style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}
         >
-          <Button variation="primary" size="medium" type="reset">
+          <Button variation="primary" size="medium" type="reset" onClick={()=> onCloseModal()}>
             Cancel
           </Button>
           <Button variation="secondary" size="medium">

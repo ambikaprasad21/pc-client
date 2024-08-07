@@ -1,8 +1,12 @@
+import { useEffect } from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import styles from "./TermsOfServices.module.css";
 
 function TermsOfServices() {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div>
       <Header />
@@ -124,7 +128,7 @@ function Data() {
             <p>
               We reserve the right, at our sole discretion, to modify or replace
               these Terms of Service at any time. If a revision is material, we
-              will provide at least 30 days' notice prior to any new terms
+              will provide at least 30 day's notice prior to any new terms
               taking effect. What constitutes a material change will be
               determined at our sole discretion.
             </p>

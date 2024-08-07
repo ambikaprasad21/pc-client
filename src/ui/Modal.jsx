@@ -11,6 +11,7 @@ import { createPortal } from "react-dom";
 import styled from "styled-components";
 
 const StyledModal = styled.div`
+  max-height: 80%;
   position: fixed;
   top: 50%;
   left: 50%;
@@ -20,6 +21,7 @@ const StyledModal = styled.div`
   box-shadow: 0 2.4rem 3.2rem rgba(0, 0, 0, 0.12);
   padding: 3.2rem 4rem;
   transition: all 0.5s;
+  overflow-y: scroll;
 `;
 
 const Overlay = styled.div`
@@ -103,7 +105,10 @@ function Window({ children, name }) {
     <Overlay>
       <StyledModal ref={ref}>
         <Button onClick={close}>X</Button>
-        {children}
+        {createElement(children.type, {
+          ...children.props,
+          onCloseModal: () => close(),
+        })}
       </StyledModal>
     </Overlay>,
     document.body

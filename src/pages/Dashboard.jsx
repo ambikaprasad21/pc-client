@@ -1,45 +1,111 @@
-import Button from "../ui/Button";
-import ChangePP from "../ui/ChangePP";
-import {
-  FaTrashAlt,
-  FaUserTie,
-  FaVideo,
-  FaFilePdf,
-  FaImage,
-  FaDiceD6,
-  FaFileUpload,
-  FaCloudUploadAlt,
-  FaBriefcase,
-  FaFacebookMessenger,
-} from "react-icons/fa";
-import Row from "../ui/Row";
-import { useForm, Controller } from "react-hook-form";
-import Input from "../ui/Input";
-// import Editor from "../components/Editor";
-import { Textarea } from "../ui/TextArea";
-import { useRef, useState } from "react";
-import styled from "styled-components";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+// import Button from "../ui/Button";
+// import ChangePP from "../ui/ChangePP";
+// import {
+//   FaTrashAlt,
+//   FaUserTie,
+//   FaVideo,
+//   FaFilePdf,
+//   FaImage,
+//   FaDiceD6,
+//   FaFileUpload,
+//   FaCloudUploadAlt,
+//   FaBriefcase,
+//   FaFacebookMessenger,
+// } from "react-icons/fa";
+// import Row from "../ui/Row";
+// import { useForm, Controller } from "react-hook-form";
+// import Input from "../ui/Input";
+// // import Editor from "../components/Editor";
+// import { Textarea } from "../ui/TextArea";
+// import { useRef, useState } from "react";
+// import styled from "styled-components";
+// import DatePicker from "react-datepicker";
+// import "react-datepicker/dist/react-datepicker.css";
 
-import Select from "react-select";
+import styled, { css } from "styled-components";
+import Row from "../ui/Row";
+import Progress from "../ui/Progress";
+import Calender from "../components/Calender";
+
+// import Select from "react-select";
+
+const ProgCont = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+`;
+
+const Title = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 1.6rem;
+  font-weight: 600;
+
+  ${(props) =>
+    props.size === "small" &&
+    css`
+      font-size: 1.2rem;
+      font-weight: 550;
+    `}
+`;
+
+const Card = styled.div`
+  background-color: #f7f7f7;
+  width: 30rem;
+  padding: 1rem 1.6rem;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: flex-start; */
+  gap: 1.4rem;
+`;
+
+const CardContainer = styled.div`
+  display: flex;
+  gap: 2rem;
+`;
+
+const CardTitle = styled.div`
+  font-size: 1.8rem;
+  font-weight: 550;
+  color: #3b3b3b;
+`;
 
 function Dashboard() {
   return (
-    <div>
-      Dashboard
-      {/* <ChangePP />
-      <div>
-        <DeleteModal />
-      </div>
-      <AddMember />
-      <EditMember />
-      <CreateProject />
-      <EditProject />
-      <UploadFile fileType={"image"} />
-      <CreateTask />
-      <MessageMember /> */}
-    </div>
+    <Row>
+      <CardContainer>
+        <Card>
+          <CardTitle>Projects</CardTitle>
+          <ProgCont>
+            <div>
+              <Title size="small">
+                <div>Progress</div>
+                <div>70 %</div>
+              </Title>
+            </div>
+            <Progress progress="70" />
+          </ProgCont>
+          <span style={{ color: "#636363" }}>Got 10 projects</span>
+        </Card>
+        <Card>
+          <CardTitle>Tasks</CardTitle>
+          <ProgCont>
+            <div>
+              <Title size="small">
+                <div>Progress</div>
+                <div>70 %</div>
+              </Title>
+            </div>
+            <Progress progress="70" />
+          </ProgCont>
+          <span style={{ color: "#636363" }}>Got 10 tasks</span>
+        </Card>
+      </CardContainer>
+      <Calender />
+    </Row>
   );
 }
 

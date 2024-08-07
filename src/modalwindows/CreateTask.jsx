@@ -29,7 +29,7 @@ const File = styled.div`
 import Select from "react-select";
 import styled from "styled-components";
 import Button from "../ui/Button";
-function CreateTask() {
+function CreateTask({ onCloseModal }) {
   const {
     register,
     handleSubmit,
@@ -223,7 +223,12 @@ function CreateTask() {
         </div>
 
         <div>
-          <Button variation="primary" size="medium" type="reset">
+          <Button
+            variation="primary"
+            size="medium"
+            type="reset"
+            onClick={() => onCloseModal()}
+          >
             Cancel
           </Button>
           <Button variation="secondary" size="medium">

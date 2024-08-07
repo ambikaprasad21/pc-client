@@ -3,7 +3,7 @@ import { FaUserTie } from "react-icons/fa";
 import Row from "../ui/Row";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
-function EditMember({ data }) {
+function EditMember({ data, onCloseModal }) {
   // const { id: memberId, ...memberDetails } = data;
   const { register, handleSubmit, formState } = useForm({
     // defaultValues: memberDetails,
@@ -70,7 +70,12 @@ function EditMember({ data }) {
           />
         </Row>
         <div>
-          <Button variation="primary" size="medium" type="reset">
+          <Button
+            variation="primary"
+            size="medium"
+            type="reset"
+            onClick={() => onCloseModal()}
+          >
             Cancel
           </Button>
           <Button variation="secondary" size="medium">

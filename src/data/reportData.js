@@ -4,8 +4,8 @@ export default {
   pending: 2,
   "in-progress": 5,
   lowCount: 1,
-  mediumCount: 2,
-  highCount: 2,
+  mediumCount: 10,
+  highCount: 6,
   task: [
     {
       taskTitle: "Task1",

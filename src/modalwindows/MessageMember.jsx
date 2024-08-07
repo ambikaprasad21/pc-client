@@ -4,7 +4,7 @@ import Row from "../ui/Row";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
 
-function MessageMember() {
+function MessageMember({ onCloseModal }) {
   const { register, handleSubmit } = useForm();
 
   function onSubmit(data) {
@@ -62,7 +62,11 @@ function MessageMember() {
 
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
         <div>
-          <Button variation="primary" size="medium">
+          <Button
+            variation="primary"
+            size="medium"
+            onClick={() => onCloseModal()}
+          >
             Cancel
           </Button>
           <Button variation="secondary" size="medium">

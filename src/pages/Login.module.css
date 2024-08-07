@@ -118,7 +118,7 @@
 
 .d-c input:focus {
   outline: 2px solid #afcbe8;
-  color: #636363;
+  color: #000;
 }
 
 .conditions {

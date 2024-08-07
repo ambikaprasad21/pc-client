@@ -33,7 +33,7 @@ const File = styled.div`
   }
 `;
 
-function ChangePP() {
+function ChangePP({ onCloseModal }) {
   const fileInputRef = useRef(null);
   const [file, setFile] = useState(null);
 
@@ -64,9 +64,19 @@ function ChangePP() {
         <p>Click here to select image</p>
       </File>
 
-      <Button size="small" variation="secondary" onClick={() => handleUpload()}>
-        Upload Image
-      </Button>
+      <div>
+        <Button
+          variation="primary"
+          size="medium"
+          type="reset"
+          onClick={() => onCloseModal()}
+        >
+          Cancel
+        </Button>
+        <Button variation="secondary" size="medium">
+          Submit
+        </Button>
+      </div>
     </StyledDiv>
   );
 }

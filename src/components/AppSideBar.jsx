@@ -4,6 +4,8 @@ import MainNav from "../ui/MainNav";
 
 import { MdLogout } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
 
 const StyledSideBar = styled.aside`
   background-color: #fff;
@@ -44,18 +46,14 @@ const StyledDiv = styled.div`
 `;
 
 function AppSideBar() {
-  const navigate = useNavigate();
-
-  function handleLogout() {
-    navigate("/", { replace: true });
-  }
+  const { handleLogout } = useContext(UserContext);
 
   return (
     <StyledSideBar>
       <SidebarLogo />
       <MainNav />
       <StyledDiv>
-        <Logout onClick={() => handleLogout()}>
+        <Logout onClick={handleLogout}>
           <span>Logout </span>
           <MdLogout />
         </Logout>
