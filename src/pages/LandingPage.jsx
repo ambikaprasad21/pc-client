@@ -274,7 +274,7 @@ function Pricing() {
           headers: {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
-            authorization: `Bearer ${prozVerify}`,
+            authorization: `Bearer ${localStorage.getItem("prozverify")}`,
           },
         });
 
