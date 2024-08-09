@@ -36,8 +36,10 @@ function ResetPassword() {
       if (res.status === 200) {
         const data = await res.json();
         localStorage.setItem("prozverify", data.token);
-        navigate("/dashboard", { replace: true });
-        setUser(data.user);
+        setTimeout(() => {
+          setUser(data.user);
+          navigate("/dashboard", { replace: true });
+        }, 1000);
         toast.success(data.message);
       } else {
         const data = await res.json();

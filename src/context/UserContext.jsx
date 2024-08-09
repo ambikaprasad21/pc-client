@@ -45,7 +45,7 @@ export function UserContextProvider({ children }) {
     navigate("/", { replace: true });
   }
   return (
-    <UserContext.Provider value={{ user, setUser, handleLogout }}>
+    <UserContext.Provider value={{ user, setUser, prozVerify, handleLogout }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,9 +1,14 @@
-import { Suspense, useState } from "react";
+import { Suspense, useContext, useState } from "react";
 
 import Header from "../components/Header";
 import LazyImage from "./../utility/LazyImage";
 import styles from "./LandingPage.module.css";
 import Footer from "../components/Footer";
+import { UserContext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
+import { loadStripe } from "@stripe/stripe-js";
+import { API } from "../utility/constant";
+import SpinnerSm from "../ui/SpinnerSm";
 
 function LandingPage() {
   return (
@@ -228,6 +233,64 @@ function About() {
 }
 
 function Pricing() {
+  const { user, prozVerify } = useContext(UserContext);
+  const [loader1, setLoader1] = useState(false);
+  const [loader2, setLoader2] = useState(false);
+  const navigate = useNavigate();
+
+  async function handlePurchase(e) {
+    if (!user) {
+      navigate("/auth/login/");
+    } else {
+      const typeOfPurchase = e.target.getAttribute("planType");
+
+      console.log(typeOfPurchase);
+      if (typeOfPurchase === "advanced") {
+        setLoader1(true);
+      } else {
+        setLoader2(true);
+      }
+
+      const stripe = await loadStripe(
+        "pk_test_51PlaJVGdKUuBAw5mkQDtPxwylNK91mJbd4cTpSZGddSH50gMWQUpJ7DYdTmzpKrXQktNS77BqbLgtjKmBnGxfP6Y00ILARHtsJ"
+      );
+
+      //Calling the backend api
+
+      // remote logo url = https://github.com/ambikaprasad21/pc-client/blob/master/public/images/logo.png
+      try {
+        const res = await fetch(`${API}/user/purchase`, {
+          method: "POST",
+          body: JSON.stringify({
+            type: typeOfPurchase,
+            logo: "https://github.com/ambikaprasad21/pc-client/blob/master/public/images/logo.png",
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            authorization: `Bearer ${prozVerify}`,
+          },
+        });
+
+        const session = await res.json();
+        const result = stripe.redirectToCheckout({
+          sessionId: session.id,
+        });
+
+        if (result.error) {
+          console.log(result.error);
+        }
+      } catch (err) {
+        console.log(err.message);
+      } finally {
+        if (typeOfPurchase === "advanced") {
+          setLoader1(false);
+        } else {
+          setLoader2(false);
+        }
+      }
+    }
+  }
   return (
     <div className={styles.pricing} id="pricing">
       <h1>
@@ -390,8 +453,12 @@ function Pricing() {
             </div>
           </div>
           <div>
-            <button className={`${styles["p-c-b"]} ${styles["s-b"]}`}>
-              PURCHASE
+            <button
+              className={`${styles["p-c-b"]} ${styles["s-b"]}`}
+              planType="advanced"
+              onClick={(e) => handlePurchase(e)}
+            >
+              {loader1 ? <SpinnerSm /> : "PURCHASE"}
             </button>
           </div>
         </div>
@@ -473,8 +540,12 @@ function Pricing() {
             </div>
           </div>
           <div>
-            <button className={`${styles["p-c-b"]} ${styles["p-b"]}`}>
-              PURCHASE
+            <button
+              className={`${styles["p-c-b"]} ${styles["p-b"]}`}
+              planType="basic"
+              onClick={(e) => handlePurchase(e)}
+            >
+              {loader2 ? <SpinnerSm /> : "PURCHASE"}
             </button>
           </div>
         </div>
