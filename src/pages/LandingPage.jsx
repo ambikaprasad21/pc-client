@@ -11,8 +11,10 @@ import { API } from "../utility/constant";
 import SpinnerSm from "../ui/SpinnerSm";
 
 function LandingPage() {
-  const { user } = useContext(UserContext);
-  useEffect(() => {}, [user]);
+  // const { user, setUser } = useContext(UserContext);
+  // useEffect(() => {
+  //   setUser(user);
+  // }, [user]);
 
   return (
     <div id="home">
@@ -240,6 +242,7 @@ function Pricing() {
   const [loader1, setLoader1] = useState(false);
   const [loader2, setLoader2] = useState(false);
   const navigate = useNavigate();
+  // prozVerify = localStorage.getItem("prozverify");
 
   async function handlePurchase(e) {
     if (!user) {

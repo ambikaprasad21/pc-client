@@ -9,7 +9,7 @@ export const UserContext = createContext();
 export function UserContextProvider({ children }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [prozVerify, setProzVerify] = useState(
+  let [prozVerify, setProzVerify] = useState(
     localStorage.getItem("prozverify")
   );
 
