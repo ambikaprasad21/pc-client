@@ -25,6 +25,7 @@ export function UserContextProvider({ children }) {
       if (res.status === 200) {
         const data = await res.json();
         setUser(data.data);
+        setProzVerify(localStorage.getItem("prozverify"));
       } else {
         const data = await res.json();
         toast.error(data.message);
@@ -37,7 +38,7 @@ export function UserContextProvider({ children }) {
     if (prozVerify) {
       getProfile();
     }
-  }, [prozVerify]);
+  }, [prozVerify, setProzVerify, navigate]);
 
   function handleLogout() {
     localStorage.clear("prozverify");
