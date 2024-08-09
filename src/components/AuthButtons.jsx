@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import styles from "./AuthButtons.module.css";
 import { useContext } from "react";
 import { UserContext } from "../context/UserContext";
@@ -27,7 +27,12 @@ function AuthButtons() {
           <Button variation="primary" size="small" onClick={handleLogout}>
             Logout
           </Button>
-          <Avatar size={"small"} src={"/images/z.jpg"} />
+          <Link
+            to={"/dashboard"}
+            style={{ color: "inherit", textDecoration: "none" }}
+          >
+            <Avatar size={"small"} src={"/images/z.jpg"} />
+          </Link>
         </Row>
       )}
     </div>
