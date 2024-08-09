@@ -1,4 +1,4 @@
-import { Suspense, useContext, useState } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
 
 import Header from "../components/Header";
 import LazyImage from "./../utility/LazyImage";
@@ -11,6 +11,9 @@ import { API } from "../utility/constant";
 import SpinnerSm from "../ui/SpinnerSm";
 
 function LandingPage() {
+  const { user } = useContext(UserContext);
+  useEffect(() => {}, [user]);
+
   return (
     <div id="home">
       <div className={styles["header-hero"]}>
