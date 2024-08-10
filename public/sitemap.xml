@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+		<!--	created with www.mysitemapgenerator.com	-->
+		<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+	<loc>https://prozcollab.vercel.app/</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/auth/login</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/auth/signup</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/dashboard</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/about</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/articles</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/pricing</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/privacy-policy</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/terms-of-services</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/auth/forgot-password</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>0.8</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/profile</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/messages</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/notifications</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/my-projects</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/members</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/projects</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/analytics</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+<url>
+	<loc>https://prozcollab.vercel.app/trash</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+
+<url>
+	<loc>https://prozcollab.vercel.app/forgot-password</loc>
+	<lastmod>2024-08-10T07:54:55+01:00</lastmod>
+	<priority>1.0</priority>
+</url>
+</urlset>

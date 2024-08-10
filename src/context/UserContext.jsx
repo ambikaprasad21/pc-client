@@ -9,7 +9,7 @@ export const UserContext = createContext();
 export function UserContextProvider({ children }) {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  let [prozVerify, setProzVerify] = useState(
+  const [prozVerify, setProzVerify] = useState(
     localStorage.getItem("prozverify")
   );
 
@@ -38,7 +38,7 @@ export function UserContextProvider({ children }) {
     if (prozVerify) {
       getProfile();
     }
-  }, [prozVerify, setProzVerify, navigate]);
+  }, [prozVerify]);
 
   function handleLogout() {
     localStorage.clear("prozverify");
