@@ -17,7 +17,7 @@ export function UserContextProvider({ children }) {
   useEffect(() => {
     if (searchParams.get("demo")) {
       setProzVerify(searchParams.get("demo"));
-      searchParams.delete("demo");
+      localStorage.setItem("prozverify", searchParams.get("demo"));
     }
   }, []);
 
