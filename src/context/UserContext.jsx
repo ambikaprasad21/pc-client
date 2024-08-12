@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { createContext } from "react";
 import { API } from "../utility/constant";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export const UserContext = createContext();
 
@@ -12,6 +12,14 @@ export function UserContextProvider({ children }) {
   const [prozVerify, setProzVerify] = useState(
     localStorage.getItem("prozverify")
   );
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("demo")) {
+      setProzVerify(searchParams.get("demo"));
+      searchParams.delete("demo");
+    }
+  }, []);
 
   useEffect(() => {
     async function getProfile() {
