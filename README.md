@@ -30,6 +30,10 @@ ProzCollab is a scalable full-stack platform designed for real-time project coll
 - **Cloud Storage**: Cloudinary
 - **Payment Processing**: Stripe
 
+## Data modelling 
+[https://ambikaprasad21.github.io/Project-managment-Data-Modeling/](https://ambikaprasad21.github.io/Project-managment-Data-Modeling/)
+![Data modeling photo](https://github.com/ambikaprasad21/pc-client/blob/master/Screenshot%202024-08-13%20202556.png)
+
 ## Installation
 
 To set up ProzCollab locally, follow these steps:
