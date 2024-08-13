@@ -61,4 +61,4 @@ To set up ProzCollab locally, follow these steps:
 To start the development server:
 
 ```bash
-npm start
+npm run dev
