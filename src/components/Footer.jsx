@@ -3,6 +3,7 @@ import { Link as ScrollLink } from "react-scroll";
 import styles from "./Footer.module.css";
 import Logo from "./Logo";
 import { useState } from "react";
+import Email from "./../utility/constant";
 
 function Footer() {
   const [year, setYear] = useState(new Date().getFullYear());
@@ -40,7 +41,7 @@ function Footer() {
             </div>
             <div className={styles["p-l"]}>
               <p>Contact Us</p>
-              <p className={styles.email}>prozcollab.support@gmail.com</p>
+              <p className={styles.email}>{Email}</p>
             </div>
           </div>
         </div>
