@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import styles from "./TermsOfServices.module.css";
-import Email from "./../utility/constant";
+import { EMAIL } from "./../utility/constant";
 
 function TermsOfServices() {
   useEffect(() => {
@@ -138,7 +138,7 @@ function Data() {
             <h2>Contact Us</h2>
             <p>
               If you have any questions about these Terms of Service, please
-              contact us at <b>{Email}</b>.
+              contact us at <b>{EMAIL}</b>.
             </p>
           </div>
         </div>

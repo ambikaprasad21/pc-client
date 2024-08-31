@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import styles from "./PrivacyPolicy.module.css";
-import Email from "./../utility/constant";
+import { EMAIL } from "./../utility/constant";
 
 function PrivacyPolicy() {
   useEffect(() => {
@@ -114,7 +114,7 @@ function Data() {
             <h2>Contact Us</h2>
             <p>
               If you have any questions about these Privacey Policy, please
-              contact us at <b>{Email}</b>.
+              contact us at <b>{EMAIL}</b>.
             </p>
           </div>
         </div>
