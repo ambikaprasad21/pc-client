@@ -17,7 +17,7 @@ const StyledDiv = styled.div`
   width: 30rem;
   max-width: 30rem;
   border-radius: 10px;
-  background-color: #f9f9f9;
+  /* background-color: #f9f9f9; */
 `;
 
 const File = styled.div`
