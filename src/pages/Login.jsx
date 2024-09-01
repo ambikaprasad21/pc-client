@@ -21,7 +21,7 @@ function Login() {
   const navigate = useNavigate();
   const { register, handleSubmit, formState, watch } = useForm();
   const { errors } = formState;
-  const { setUser } = useContext(UserContext);
+  const { setUser, setProzVerify } = useContext(UserContext);
 
   const isDirty = useRef(false);
 
@@ -61,6 +61,7 @@ function Login() {
 
         toast.success("Logged in successfully");
         setUser(data.data);
+        setProzVerify(data.token);
         localStorage.setItem("prozverify", data.token);
         navigate("/dashboard");
       } else {

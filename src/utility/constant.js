@@ -4,8 +4,10 @@ export const API = "https://project-managment-api.onrender.com/pm/api/v1";
 export const demoToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmJhNTJiMTdhNWMxNzZmMTQ2Y2VmNjUiLCJpYXQiOjE3MjM0ODY5MDJ9.dwP_Kg4YzlP07bs9Mf01nO57s8GM0OaprmDtiTUcM-Y";
 
-export const EMAIL = "prozcollab.team@gmail.com"
+export const EMAIL = "prozcollab.team@gmail.com";
 export const APIHEADER = {
   "Content-Type": "application/json",
   "Access-Control-Allow-Origin": "*",
 };
+
+export const token = localStorage.getItem("prozverify");

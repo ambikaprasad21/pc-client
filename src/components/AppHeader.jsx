@@ -3,6 +3,7 @@ import styles from "./AppHeader.module.css";
 import { MdMenu, MdChat, MdNotifications } from "react-icons/md";
 import { Link } from "react-router-dom";
 import Avatar from "./Avatar";
+import { useUser } from "../context/UserContext";
 
 const StyledHeader = styled.header`
   /* z-index: 10; */
@@ -21,6 +22,7 @@ const HeadOptions = styled.div`
 `;
 
 function AppHeader() {
+  const { user } = useUser();
   return (
     <StyledHeader>
       <MdMenu size="2rem" />
@@ -29,7 +31,7 @@ function AppHeader() {
         <MessageIcon newMessages={4} />
         <NotifiIcon newNotifi={4} />
         <Link to={"profile"} title="User profile">
-          <Avatar src={"/images/z.jpg"} name={"Test User"} size={"small"} />
+          <Avatar src={user?.photo} name={"Test User"} size={"small"} />
         </Link>
       </HeadOptions>
     </StyledHeader>

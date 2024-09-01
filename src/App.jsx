@@ -30,15 +30,19 @@ import { UserContextProvider } from "./context/UserContext";
 import { Toaster } from "react-hot-toast";
 import ApplicationProtect from "./protected/ApplicationProtect";
 import AuthProtect from "./protected/AuthProtect";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
       <BrowserRouter>
         <UserContextProvider>
           <Routes>
             <Route index path="/" element={<LandingPage />} />
-
             <Route
               element={
                 <ApplicationProtect>
@@ -65,7 +69,6 @@ function App() {
               <Route path="messages" element={<Messages />} />
               <Route path="notifications" element={<Notifications />} />
             </Route>
-
             <Route
               path="/auth"
               element={
@@ -83,7 +86,6 @@ function App() {
                 element={<ResetPassword />}
               />
             </Route>
-
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
             <Route path="terms-of-services" element={<TermsOfServices />} />
           </Routes>
@@ -109,7 +111,7 @@ function App() {
           },
         }}
       />
-    </>
+    </QueryClientProvider>
   );
 }
 

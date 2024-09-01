@@ -35,7 +35,7 @@ function VerifyOtp() {
     }
   };
 
-  const { user, setUser } = useContext(UserContext);
+  const { user, setUser, setProzVerify } = useContext(UserContext);
 
   async function handleVerifyOtp() {
     const otpCode = parseInt(otp.join(""), 10);
@@ -56,6 +56,7 @@ function VerifyOtp() {
         const data = await res.json();
         toast.success("Logged in successfully");
         setUser(data.data);
+        setProzVerify(data.token);
         localStorage.setItem("prozverify", data.token);
         navigate("/dashboard", { replace: true });
       } else {

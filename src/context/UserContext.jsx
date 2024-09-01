@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { createContext } from "react";
 import { API } from "../utility/constant";
 import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-export const UserContext = createContext();
+const UserContext = createContext();
 
 export function UserContextProvider({ children }) {
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ export function UserContextProvider({ children }) {
     async function getProfile() {
       const res = await fetch(`${API}/user/getloggedInUser`, {
         headers: {
-          authorization: `Bearer ${prozVerify}`,
+          Authorization: `Bearer ${prozVerify}`,
           "Access-Control-Allow-Origin": "*",
         },
       });
@@ -54,8 +54,21 @@ export function UserContextProvider({ children }) {
     navigate("/", { replace: true });
   }
   return (
-    <UserContext.Provider value={{ user, setUser, prozVerify, handleLogout }}>
+    <UserContext.Provider
+      value={{ user, setUser, prozVerify, setProzVerify, handleLogout }}
+    >
       {children}
     </UserContext.Provider>
   );
 }
+
+function useUser() {
+  const context = useContext(UserContext);
+  if (context === undefined) {
+    throw new Error("UserContext used outside the UserProvider");
+  }
+
+  return context;
+}
+
+export { UserContext, useUser };

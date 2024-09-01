@@ -1,4 +1,3 @@
-import { Switch } from "@headlessui/react";
 import { useState } from "react";
 import Avatar from "../components/Avatar";
 import Button from "../ui/Button";
@@ -10,6 +9,16 @@ import { MdCreate } from "react-icons/md";
 import { Textarea } from "../ui/TextArea";
 import Modal from "../ui/Modal";
 import ChangePP from "../ui/ChangePP";
+import { useUser } from "../context/UserContext";
+import {
+  changePasswordApi,
+  editBioApi,
+  editSkillApi,
+  visibilityApi,
+} from "../services/api/api";
+import { useForm } from "react-hook-form";
+import styled from "styled-components";
+import toast from "react-hot-toast";
 
 const data = {
   bio: "Headless UI does not strictly require Tailwind CSS to function. However, Headless UI components are designed to integrate seamlessly with Tailwind CSS, making it easier to style and customize them. If you choose to use Headless UI without Tailwind CSS, you'll need to provide your own styles.",
@@ -31,17 +40,32 @@ const data = {
   visibility: true,
 };
 
+const Error = styled.span`
+  font-size: 1rem;
+  padding: 0 5px;
+  color: #d71e1e;
+`;
+
 function Profile() {
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  const [bio, setBio] = useState(data.bio);
+  const { user, prozVerify, setProzVerify } = useUser();
+  const [bio, setBio] = useState(user.bio);
   const [editBio, setEditBio] = useState(false);
   const [editSkills, setEditSkills] = useState(false);
-  const [skills, setSkills] = useState(data.skill);
+  const [skills, setSkills] = useState(user.skills);
   const [newSkill, setNewSkill] = useState("");
+  const { register, handleSubmit, formState, getValues, reset } = useForm();
+  const { errors } = formState;
+
+  const handleEditBio = (bio) => {
+    setEditBio(false);
+    setBio(bio);
+    editBioApi(bio, prozVerify);
+  };
 
   const handleAddSkill = (e) => {
     if (e.key === "Enter" && newSkill.trim()) {
       setSkills([...skills, newSkill.trim()]);
+      editSkillApi(newSkill.trimEnd(), prozVerify);
       setNewSkill("");
     }
   };
@@ -50,21 +74,31 @@ function Profile() {
     setSkills(skills.filter((skill) => skill !== skillToRemove));
   };
 
-  function handleChangePassword() {}
+  async function handleChangePassword(data) {
+    changePasswordApi(data, prozVerify)
+      .then((res) => {
+        if (res.status === 200) {
+          toast.success("Password changed successfully.");
+          localStorage.setItem("prozverify", res.data.token);
+          setProzVerify(res.data.token);
+          // window.location.reload(true);
+        } else {
+          toast.error("There was some error try again");
+        }
+      })
+      .catch((err) => {
+        toast.error(err.message || "An error occurred.");
+      });
+
+    reset();
+  }
+
   return (
     <div className={styles.section}>
       <div className={styles.left}>
-        <Avatar src={"/images/z.jpg"} size={"large"} name={"Jessica Doe"} />
-        <p className={styles.name}>Jessica Doe</p>
-        <p className={styles.mail}>jessicadoe123@gmail.com</p>
-        {/* <Button
-          size={"medium"}
-          variation={"secondary"}
-          onClick={() => setIsModalOpen((show) => !show)}
-        >
-          Upload profile picture
-        </Button>
-        {isModalOpen && <Modal />} */}
+        <Avatar src={user.photo} size={"large"} name={"Jessica Doe"} />
+        <p className={styles.name}>{`${user.firstName} ${user.lastName}`}</p>
+        <p className={styles.mail}>{user.email}</p>
         <Modal>
           <Modal.Open opens="upload-pp">
             <Button size={"medium"} variation={"secondary"}>
@@ -91,7 +125,7 @@ function Profile() {
               <Button
                 size={"small"}
                 variation={"secondary"}
-                onClick={() => setEditBio(false)}
+                onClick={() => handleEditBio(bio)}
               >
                 Edit
               </Button>
@@ -170,22 +204,54 @@ function Profile() {
         </div>
         <div className={styles["r-b"]}>
           <h2 className={styles.heading}>Change password</h2>
-          <div className={styles["c-p"]}>
+          <form
+            className={styles["c-p"]}
+            onSubmit={handleSubmit(handleChangePassword)}
+          >
             <Row type={"vertical"}>
-              <Input placeholder="Current password" type="text" />
-              <Input placeholder="New password" type="text" />
-              <Input placeholder="Confirm new password" type="text" />
+              <Input
+                placeholder="Current password"
+                type="text"
+                id={"currentPassword"}
+                {...register("currentPassword", {
+                  required: "This field is required!",
+                })}
+              />
+              {errors?.currentPassword?.message && (
+                <Error>{errors?.currentPassword?.message}</Error>
+              )}
+              <Input
+                placeholder="New password"
+                type="text"
+                id={"newPassword"}
+                {...register("newPassword", {
+                  required: "This field is required!",
+                })}
+              />
+              {errors?.newPassword?.message && (
+                <Error>{errors?.newPassword?.message}</Error>
+              )}
+              <Input
+                placeholder="Confirm new password"
+                type="text"
+                id={"confirmPassword"}
+                {...register("confirmPassword", {
+                  required: "This field is required!",
+                  validate: (value) =>
+                    value === getValues().newPassword ||
+                    "password and confirm password do not match!",
+                })}
+              />
+              {errors?.confirmPassword?.message && (
+                <Error>{errors?.confirmPassword?.message}</Error>
+              )}
             </Row>
             <div className={styles["c-p-btn"]}>
-              <Button
-                size={"medium"}
-                variation={"secondary"}
-                onClick={() => handleChangePassword()}
-              >
+              <Button size={"medium"} variation={"secondary"}>
                 Change password
               </Button>
             </div>
-          </div>
+          </form>
         </div>
       </Row>
     </div>
@@ -193,10 +259,12 @@ function Profile() {
 }
 
 const SwitchComponent = () => {
-  const [isPublic, setIsPublic] = useState(data.visibility);
+  const { user, prozVerify } = useUser();
+  const [isPublic, setIsPublic] = useState(user.profile);
 
   const toggleSwitch = () => {
     setIsPublic(!isPublic);
+    visibilityApi(prozVerify);
   };
 
   return (
