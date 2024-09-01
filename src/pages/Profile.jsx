@@ -19,6 +19,7 @@ import {
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import toast from "react-hot-toast";
+import SpinnerSm from "../ui/SpinnerSm";
 
 const data = {
   bio: "Headless UI does not strictly require Tailwind CSS to function. However, Headless UI components are designed to integrate seamlessly with Tailwind CSS, making it easier to style and customize them. If you choose to use Headless UI without Tailwind CSS, you'll need to provide your own styles.",
@@ -54,6 +55,7 @@ function Profile() {
   const [skills, setSkills] = useState(user.skills);
   const [newSkill, setNewSkill] = useState("");
   const { register, handleSubmit, formState, getValues, reset } = useForm();
+  const [loading, setLoading] = useState(false);
   const { errors } = formState;
 
   const handleEditBio = (bio) => {
@@ -75,19 +77,22 @@ function Profile() {
   };
 
   async function handleChangePassword(data) {
+    setLoading(true);
     changePasswordApi(data, prozVerify)
       .then((res) => {
         if (res.status === 200) {
           toast.success("Password changed successfully.");
           localStorage.setItem("prozverify", res.data.token);
           setProzVerify(res.data.token);
-          // window.location.reload(true);
         } else {
           toast.error("There was some error try again");
         }
       })
       .catch((err) => {
         toast.error(err.message || "An error occurred.");
+      })
+      .finally(() => {
+        setLoading(false);
       });
 
     reset();
@@ -248,7 +253,7 @@ function Profile() {
             </Row>
             <div className={styles["c-p-btn"]}>
               <Button size={"medium"} variation={"secondary"}>
-                Change password
+                {loading ? <SpinnerSm /> : "Change password"}
               </Button>
             </div>
           </form>

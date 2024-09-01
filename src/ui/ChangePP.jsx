@@ -77,7 +77,7 @@ function ChangePP({ onCloseModal }) {
         }
       })
       .catch((err) => {
-        toast.error(err.message || "There was some error, please try again");
+        toast.error("Upload different image");
       })
       .finally(() => {
         onCloseModal();
