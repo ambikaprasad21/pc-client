@@ -4,6 +4,8 @@
 
 ProzCollab is a scalable full-stack platform designed for real-time project collaboration and advanced analytics. It provides a robust environment for teams to work together efficiently and effectively.
 
+##Backend [link](https://github.com/ambikaprasad21/Project-Managment-API)
+
 ![Landing Page](https://github.com/ambikaprasad21/pc-client/blob/master/Screenshot%202024-08-13%20200949.png)
 ![Dashboard](https://github.com/ambikaprasad21/pc-client/blob/master/Screenshot%202024-08-13%20201019.png)
 ![user profile](https://github.com/ambikaprasad21/pc-client/blob/master/Screenshot%202024-08-13%20201040.png)
