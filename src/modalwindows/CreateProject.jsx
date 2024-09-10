@@ -6,6 +6,10 @@ import Input from "../ui/Input";
 import { Textarea } from "../ui/TextArea";
 import styled from "styled-components";
 import Button from "../ui/Button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createProjectFn } from "../services/functions/projectFn";
+import toast from "react-hot-toast";
+import SpinnerSm from "../ui/SpinnerSm";
 
 const File = styled.div`
   cursor: pointer;
@@ -27,6 +31,19 @@ const File = styled.div`
 `;
 
 function CreateProject({ onCloseModal }) {
+  const queryClient = useQueryClient();
+  const { isLoading, mutate } = useMutation({
+    mutationKey: ["projects"],
+    mutationFn: createProjectFn,
+    onSuccess: () => {
+      toast.success("Project created successfully.");
+      queryClient.invalidateQueries(["projects"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
   const {
     register,
     handleSubmit,
@@ -62,12 +79,27 @@ function CreateProject({ onCloseModal }) {
 
   function onSubmit(newData) {
     console.log(newData);
+    const formData = new FormData();
+    formData.append("title", newData.title);
+    formData.append("description", newData.description);
+    formData.append("deadline", newData.deadline);
+
+    if (newData.videofile) {
+      formData.append("video", newData.videofile);
+    }
+    if (newData.imagefile) {
+      formData.append("image", newData.imagefile);
+    }
+    if (newData.pdffile) {
+      formData.append("pdf", newData.pdffile);
+    }
+    mutate(formData);
   }
 
   return (
     <div
       style={{
-        padding: "0 2rem",
+        // padding: "0 2rem",
         width: "fit-content",
         display: "flex",
         flexDirection: "column",
@@ -77,17 +109,17 @@ function CreateProject({ onCloseModal }) {
     >
       <div
         style={{
-          width: "1rem",
-          height: "1rem",
+          width: "2rem",
+          height: "2rem",
           color: "#3F8EFC",
-          padding: "1.4rem",
+          padding: "2rem",
           borderRadius: "50%",
           backgroundColor: "#E3E9FF",
           position: "relative",
         }}
       >
         <FaDiceD6
-          size={"1.4rem"}
+          size={"2rem"}
           style={{
             position: "absolute",
             top: "50%",
@@ -98,9 +130,14 @@ function CreateProject({ onCloseModal }) {
       </div>
 
       <Row>
-        <p style={{ color: "#7B7979" }}>Create new project</p>
-        <p style={{ color: "#AFAEAE" }}>Enter details for this project</p>
+        <p style={{ color: "#7B7979", fontSize: "1.4rem", fontWeight: "550" }}>
+          Create new project
+        </p>
+        <p style={{ color: "#AFAEAE", fontSize: "1.2rem", fontWeight: "500" }}>
+          Enter details for this project
+        </p>
       </Row>
+
       <form onSubmit={handleSubmit(onSubmit)}>
         <Row>
           <label htmlFor="title">Title</label>
@@ -118,6 +155,16 @@ function CreateProject({ onCloseModal }) {
             id="description"
             {...register("description")}
             placeholder="Project description"
+          />
+        </Row>
+
+        <Row>
+          <label htmlFor="date">Deadline</label>
+          <Input
+            type="date"
+            id="deadline"
+            {...register("deadline")}
+            placeholder="YYYY-MM-DD"
           />
         </Row>
 
@@ -210,7 +257,7 @@ function CreateProject({ onCloseModal }) {
             Cancel
           </Button>
           <Button variation="secondary" size="medium">
-            Create project
+            {isLoading ? <SpinnerSm /> : "Create project"}
           </Button>
         </div>
       </form>

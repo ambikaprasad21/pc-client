@@ -5,6 +5,7 @@ import Row from "../ui/Row";
 import { FaFileUpload, FaCloudUploadAlt } from "react-icons/fa";
 import styled from "styled-components";
 import Button from "../ui/Button";
+import SpinnerSm from "../ui/SpinnerSm";
 
 const File = styled.div`
   cursor: pointer;
@@ -25,7 +26,7 @@ const File = styled.div`
   }
 `;
 
-function UploadFile({ fileType, onCloseModal }) {
+function UploadFile({ fileType, onCloseModal, id, isLoading, mutationFn }) {
   const {
     register,
     handleSubmit,
@@ -34,6 +35,7 @@ function UploadFile({ fileType, onCloseModal }) {
   } = useForm();
 
   const [fileErrors, setFileErrors] = useState({});
+  const [selectedFileName, setSelectedFileName] = useState("");
 
   const fileInputRef = useRef(null);
 
@@ -41,31 +43,44 @@ function UploadFile({ fileType, onCloseModal }) {
     fileInputRef.current.click();
   };
 
-  const validateFileType = (file) => {
-    if (!file) return true; // No file selected, no validation needed
+  const fileTypes = {
+    image: ["image/jpeg", "image/png", "image/gif"],
+    pdf: ["application/pdf"],
+  };
+  const acceptTypes = fileType === "image" ? "image/*" : "application/pdf";
 
-    return [...fileType].includes(file.type);
+  const validateFileType = (file) => {
+    if (!file) return true;
+
+    return fileTypes[fileType].includes(file.type);
   };
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (validateFileType(file)) {
-      setValue(fileType, file);
+      setValue("file", file);
       setFileErrors((prev) => ({ ...prev, [fileType]: false }));
+      setSelectedFileName(file.name);
     } else {
-      setValue(fileType, null);
+      setValue("file", null);
       setFileErrors((prev) => ({ ...prev, [fileType]: true }));
+      setSelectedFileName("");
     }
   };
 
   function onSubmit(newData) {
-    console.log(newData);
+    console.log(newData, id);
+    const formData = new FormData();
+    if (newData.file) {
+      formData.append(fileType, newData.file);
+    }
+    mutationFn({ id, formData });
   }
 
   return (
     <div
       style={{
-        padding: "0 2rem",
+        // padding: "0 2rem",
         width: "fit-content",
         display: "flex",
         flexDirection: "column",
@@ -75,17 +90,17 @@ function UploadFile({ fileType, onCloseModal }) {
     >
       <div
         style={{
-          width: "1rem",
-          height: "1rem",
+          width: "2rem",
+          height: "2rem",
           color: "#3F8EFC",
-          padding: "1.4rem",
+          padding: "2rem",
           borderRadius: "50%",
           backgroundColor: "#E3E9FF",
           position: "relative",
         }}
       >
         <FaFileUpload
-          size={"1.4rem"}
+          size={"2rem"}
           style={{
             position: "absolute",
             top: "50%",
@@ -96,15 +111,19 @@ function UploadFile({ fileType, onCloseModal }) {
       </div>
 
       <Row>
-        <p style={{ color: "#7B7979" }}>Upload a file</p>
-        <p style={{ color: "#AFAEAE" }}>Attach image or pdf file below</p>
+        <p style={{ color: "#7B7979", fontSize: "1.4rem", fontWeight: "550" }}>
+          Upload a file
+        </p>
+        <p style={{ color: "#AFAEAE", fontSize: "1.2rem", fontWeight: "500" }}>
+          Attach image or pdf file below
+        </p>
       </Row>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div style={{ display: "flex", gap: "1rem", padding: "1rem 0" }}>
           <div>
             <input
               type="file"
-              accept={`${fileType}/*`}
+              accept={acceptTypes}
               ref={fileInputRef}
               id="file"
               style={{ display: "none" }}
@@ -113,7 +132,11 @@ function UploadFile({ fileType, onCloseModal }) {
 
             <File onClick={handleFileInputClick}>
               <FaCloudUploadAlt size={"5rem"} />
-              <p>Click here to select a file</p>
+              {selectedFileName ? (
+                <p>{selectedFileName}</p>
+              ) : (
+                <p>Click here to select a {fileType} file</p>
+              )}
             </File>
             {fileErrors.file && (
               <p style={{ color: "red" }}>
@@ -123,7 +146,9 @@ function UploadFile({ fileType, onCloseModal }) {
           </div>
         </div>
 
-        <div>
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}
+        >
           <Button
             variation="primary"
             size="medium"
@@ -133,7 +158,7 @@ function UploadFile({ fileType, onCloseModal }) {
             Cancel
           </Button>
           <Button variation="secondary" size="medium">
-            Upload
+            {isLoading ? <SpinnerSm /> : "Upload"}
           </Button>
         </div>
       </form>

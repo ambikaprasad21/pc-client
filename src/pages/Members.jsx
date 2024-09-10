@@ -1,7 +1,7 @@
 import Button from "./../ui/Button";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
-import memberData from "./../data/memberData";
+// import memberData from "./../data/memberData";
 import Avatar from "./../components/Avatar";
 import Row from "./../ui/Row";
 import styled from "styled-components";
@@ -13,6 +13,10 @@ import Modal from "../ui/Modal";
 import AddMember from "../modalwindows/AddMember";
 import EditMember from "../modalwindows/EditMember";
 import ConfirmDelete from "../modalwindows/ConfirmDelete";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteMemberFn, getMemberFn } from "../services/functions/memberFn";
+import SpinnerSm from "../ui/SpinnerSm";
+import toast from "react-hot-toast";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -57,7 +61,7 @@ const TopDiv = styled.div`
 
 const TableHead = styled.div`
   display: grid;
-  grid-template-columns: 0.8fr 1fr 2fr 1.6fr 1fr;
+  grid-template-columns: 0.8fr 1fr 2fr 1.6fr 1.6fr 1fr;
   align-items: center;
   padding: 10px 1.2rem;
   background-color: #f0f5fa;
@@ -72,7 +76,7 @@ const TableHead = styled.div`
 
 const TableData = styled.div`
   display: grid;
-  grid-template-columns: 0.8fr 1fr 2fr 1.6fr 1fr;
+  grid-template-columns: 0.8fr 1fr 2fr 1.6fr 1.6fr 1fr;
   align-items: center;
 
   div {
@@ -89,19 +93,41 @@ const BottomDiv = styled.div`
 `;
 
 function Members() {
+  const { data: memberData } = useQuery({
+    queryKey: ["members"],
+    queryFn: getMemberFn,
+  });
+
+  const queryClient = useQueryClient();
+
+  const { isLoading: isDeleting, mutate } = useMutation({
+    mutationKey: ["members"],
+    mutationFn: deleteMemberFn,
+    onSuccess: () => {
+      toast.success("Member deleted successfully.");
+      queryClient.invalidateQueries(["members"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
   const [searchParams] = useSearchParams();
   const page = searchParams.get("page") || 1;
-  const count = memberData.length;
+  const count = memberData?.length;
   const pageCount = Math.ceil(count / PAGE_SIZE);
 
   const from = (page - 1) * PAGE_SIZE + 1 - 1;
   const to = page === pageCount ? count : page * PAGE_SIZE;
 
-  const [members, setMembers] = useState(memberData.slice(from, to));
+  const [members, setMembers] = useState(memberData?.slice(from, to));
 
   useEffect(() => {
-    setMembers(memberData.slice(from, to));
-  }, [page]);
+    setMembers(memberData?.slice(from, to));
+  }, [page, memberData]);
+
+  if (!memberData) return <SpinnerSm />;
+
   return (
     <StyledDiv>
       <StyledAddMember>
@@ -135,21 +161,23 @@ function Members() {
             <div>Name</div>
             <div>Email Address</div>
             <div>Role</div>
+            <div>Title</div>
             <div>Action</div>
           </TableHead>
           <Row gap="1.6rem">
-            {members.map((member) => (
-              <TableData key={member.id}>
+            {members?.map((member) => (
+              <TableData key={member._id}>
                 <div>
                   <Avatar
-                    src={member.photo}
-                    name={member.fullName}
+                    src={member?.photo}
+                    name={`${member.user.firstName} ${member.user.lastName}`}
                     size={"medium"}
                   />
                 </div>
-                <div>{member.fullName}</div>
-                <div>{member.email}</div>
+                <div>{`${member.user.firstName} ${member.user.lastName}`}</div>
+                <div>{member.user.email}</div>
                 <div>{member.role}</div>
+                <div>{member.title}</div>
                 <div>
                   <Modal>
                     <Modal.Open opens="upload-pp">
@@ -160,7 +188,7 @@ function Members() {
                       />
                     </Modal.Open>
                     <Modal.Window name={"upload-pp"}>
-                      <EditMember />
+                      <EditMember data={member} />
                     </Modal.Window>
                   </Modal>
 
@@ -175,7 +203,10 @@ function Members() {
                       />
                     </Modal.Open>
                     <Modal.Window name={"upload-pp"}>
-                      <ConfirmDelete />
+                      <ConfirmDelete
+                        isDeleting={isDeleting}
+                        onConfirmDelete={() => mutate(member)}
+                      />
                     </Modal.Window>
                   </Modal>
                 </div>

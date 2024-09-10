@@ -3,20 +3,38 @@ import { FaUserTie } from "react-icons/fa";
 import Row from "../ui/Row";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { editMemberFn } from "../services/functions/memberFn";
+import toast from "react-hot-toast";
+import SpinnerSm from "../ui/SpinnerSm";
 function EditMember({ data, onCloseModal }) {
-  // const { id: memberId, ...memberDetails } = data;
+  const { id: memberId, ...memberDetails } = data;
   const { register, handleSubmit, formState } = useForm({
-    // defaultValues: memberDetails,
+    defaultValues: memberDetails,
+  });
+
+  const queryClient = useQueryClient();
+  const { isLoading, mutate } = useMutation({
+    mutationKey: ["members"],
+    mutationFn: editMemberFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["members"]);
+      toast.success("Member updated successfully.");
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
   });
 
   function onSubmit(newData) {
-    console.log(newData);
+    console.log(newData, memberId);
+    mutate(newData);
   }
 
   return (
     <div
       style={{
-        padding: "0 2rem",
+        // padding: "0 2rem",
         width: "fit-content",
         display: "flex",
         flexDirection: "column",
@@ -26,17 +44,17 @@ function EditMember({ data, onCloseModal }) {
     >
       <div
         style={{
-          width: "1rem",
-          height: "1rem",
+          width: "2rem",
+          height: "2rem",
           color: "#3F8EFC",
-          padding: "1.4rem",
+          padding: "2rem",
           borderRadius: "50%",
           backgroundColor: "#E3E9FF",
           position: "relative",
         }}
       >
         <FaUserTie
-          size={"1.4rem"}
+          size={"2rem"}
           style={{
             position: "absolute",
             top: "50%",
@@ -47,8 +65,12 @@ function EditMember({ data, onCloseModal }) {
       </div>
 
       <Row>
-        <p style={{ color: "#7B7979" }}>Edit member details</p>
-        <p style={{ color: "#AFAEAE" }}>Enter new details for this member</p>
+        <p style={{ color: "#7B7979", fontSize: "1.4rem", fontWeight: "550" }}>
+          Edit member details
+        </p>
+        <p style={{ color: "#AFAEAE", fontSize: "1.2rem", fontWeight: "500" }}>
+          Enter new details for this member
+        </p>
       </Row>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Row>
@@ -69,7 +91,7 @@ function EditMember({ data, onCloseModal }) {
             placeholder="UI Designer"
           />
         </Row>
-        <div>
+        <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
           <Button
             variation="primary"
             size="medium"
@@ -79,7 +101,7 @@ function EditMember({ data, onCloseModal }) {
             Cancel
           </Button>
           <Button variation="secondary" size="medium">
-            Add member
+            {isLoading ? <SpinnerSm /> : "Edit member"}
           </Button>
         </div>
       </form>

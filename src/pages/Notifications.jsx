@@ -3,6 +3,14 @@ import Button from "../ui/Button";
 import styles from "./Notifications.module.css";
 import { BsBellFill } from "react-icons/bs";
 import styled from "styled-components";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  deleteNotification,
+  getNotifications,
+  markNotificationSeen,
+} from "../services/functions/notificationFn";
+import SpinnerSm from "../ui/SpinnerSm";
+import toast from "react-hot-toast";
 const notifiData = [
   {
     id: 1,
@@ -67,23 +75,88 @@ const Content = styled.div`
   }
 `;
 
+const NoNotifications = styled.p`
+  font-size: 2rem;
+  font-weight: 300;
+  background-color: #ccc;
+  padding: 0 2rem;
+`;
+
 function Notifications() {
-  const [notifications, setNotifications] = useState(notifiData);
+  // const [notifications, setNotifications] = useState(notifiData);
+  const queryClient = useQueryClient();
+  const { data: notifications, isLoading } = useQuery({
+    queryKey: ["notification"],
+    queryFn: getNotifications,
+  });
+
+  const { isLoading: markLoading, mutate: markMutate } = useMutation({
+    mutationKey: ["notification"],
+    mutationFn: markNotificationSeen,
+    onSuccess: (data) => {
+      toast.success("Marked as seen");
+      queryClient.invalidateQueries(["notification"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const { isLoading: loadingDelete, mutate: deleteMutate } = useMutation({
+    mutationKey: ["notification"],
+    mutationFn: deleteNotification,
+    onSuccess: (data) => {
+      toast.success("Notification deleted successfully.");
+      queryClient.invalidateQueries(["notification"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  function getTime(createdAt) {
+    const date = new Date(createdAt);
+    const options = {
+      hour: "numeric",
+      minutes: "numeric",
+      hour12: true,
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    };
+
+    const formatedTime = date.toLocaleString("en-US", options);
+    return formatedTime;
+  }
+
+  if (isLoading) return <SpinnerSm />;
   return (
     <StyledDiv>
+      {notifications.length === 0 && (
+        <NoNotifications>There are no notifications for now.</NoNotifications>
+      )}
       {notifications.map((el) => (
         <Container key={el.id}>
           <BsBellFill />
           <Content>
-            <time>{el.time}</time>
+            <time>{getTime(el.createdAt)}</time>
             <p>{el.text}</p>
             <div>
-              <Button variation="danger" size="small">
-                Delete
+              <Button
+                variation="danger"
+                size="small"
+                onClick={() => deleteMutate(el.id)}
+              >
+                {loadingDelete ? <SpinnerSm /> : "Delete"}
               </Button>
               <span></span>
-              <Button variation="secondary" size="small">
-                Mark as read
+              <Button
+                variation="secondary"
+                size="small"
+                onClick={() => markMutate(el.id)}
+              >
+                {markLoading && <SpinnerSm />}
+                {!markLoading && (el.seen ? "Already read" : "Mark as read")}
               </Button>
             </div>
           </Content>

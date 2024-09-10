@@ -1,5 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
-
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import projectData from "./../data/projectData";
 import { useEffect, useState } from "react";
 import Button from "../ui/Button";
@@ -11,6 +10,13 @@ import Modal from "../ui/Modal";
 import CreateTask from "../modalwindows/CreateTask";
 import UploadFile from "../modalwindows/UploadFile";
 import ConfirmDelete from "../modalwindows/ConfirmDelete";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  addAssetToProjectFn,
+  getProjectById,
+} from "../services/functions/projectFn";
+import SpinnerSm from "../ui/SpinnerSm";
+import toast from "react-hot-toast";
 
 const StyledDiv = styled.div`
   /* max-width: 120rem; */
@@ -138,16 +144,29 @@ const StyledBsCloudPlusFill = styled(BsCloudPlusFill)`
 
 function Project() {
   const { projectId } = useParams();
-  const [project, setProject] = useState(null);
+  const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    function getProjectById(projectId) {
-      setProject(projectData.find((el) => el.id === +projectId));
-    }
-    getProjectById(projectId);
-  }, [projectId]);
+  const { data, isLoading } = useQuery({
+    queryKey: ["projectById"],
+    queryFn: () => getProjectById(projectId),
+  });
+  const queryClient = useQueryClient();
 
+  const { isLoading: isAddingAsset, mutate } = useMutation({
+    mutationKey: ["projectById"],
+    mutationFn: addAssetToProjectFn,
+    onSuccess: () => {
+      toast.success("Asset addedd successfully.");
+      queryClient.invalidateQueries(["projectById"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  if (isLoading) return <SpinnerSm />;
+  const isAssignedProjects = location.pathname.includes("assigned");
   return (
     <StyledDiv>
       <TopBtn>
@@ -158,25 +177,27 @@ function Project() {
         >
           All task
         </Button>
-        <Modal>
-          <Modal.Open opens="upload-pp">
-            <Button variation="secondary" size="medium">
-              + Add task
-            </Button>
-          </Modal.Open>
-          <Modal.Window name={"upload-pp"}>
-            <CreateTask />
-          </Modal.Window>
-        </Modal>
+        {!isAssignedProjects && (
+          <Modal>
+            <Modal.Open opens="upload-pp">
+              <Button variation="secondary" size="medium">
+                + Add task
+              </Button>
+            </Modal.Open>
+            <Modal.Window name={"upload-pp"}>
+              <CreateTask id={projectId} />
+            </Modal.Window>
+          </Modal>
+        )}
       </TopBtn>
-      {project && (
+      {data && (
         <Row>
           <Row1>
-            <Title>{project.title}</Title>
-            <p>{project.description}</p>
+            <Title>{data.title}</Title>
+            <p>{data.description}</p>
             <Video>
               <video
-                src={project.attachments.video}
+                src={`http://127.0.0.1:9000/uploads/videos/${data.video}`}
                 controls
                 preload="auto"
                 width="640"
@@ -193,39 +214,49 @@ function Project() {
                     <img src="/images/image-icon.png" alt="icon for image" />
                     <div>Images</div>
                   </TC>
-                  <Modal>
-                    <Modal.Open opens="upload-project-attachment">
-                      <IconContainer>
-                        <StyledBsCloudPlusFill size={"2rem"} color="blue" />
-                        <HoverText>Upload file</HoverText>
-                      </IconContainer>
-                    </Modal.Open>
-                    <Modal.Window name={"upload-project-attachment"}>
-                      <UploadFile />
-                    </Modal.Window>
-                  </Modal>
-                </TableHead>
-                {project.attachments["images"].map((img, index) => (
-                  <TableData key={index}>
-                    <StyledLink
-                      to={`${img}`}
-                      style={{ textDecoration: "none", color: "inherit" }}
-                    >
-                      <Img src={img} />
-                      <div>{img}</div>
-                    </StyledLink>
+                  {!isAssignedProjects && (
                     <Modal>
-                      <Modal.Open opens="delete-project-attachment">
-                        <MdDelete
-                          color="red"
-                          size={"2rem"}
-                          cursor={"pointer"}
-                        />
+                      <Modal.Open opens="upload-project-attachment">
+                        <IconContainer>
+                          <StyledBsCloudPlusFill size={"2rem"} color="blue" />
+                          <HoverText>Upload file</HoverText>
+                        </IconContainer>
                       </Modal.Open>
-                      <Modal.Window name={"delete-project-attachment"}>
-                        <ConfirmDelete />
+                      <Modal.Window name={"upload-project-attachment"}>
+                        <UploadFile
+                          fileType={"image"}
+                          id={data._id}
+                          isLoading={isAddingAsset}
+                          mutationFn={mutate}
+                        />
                       </Modal.Window>
                     </Modal>
+                  )}
+                </TableHead>
+                {data.images.map((img, index) => (
+                  <TableData key={index}>
+                    <StyledLink
+                      to={`http://127.0.0.1:9000/uploads/images/${img}`}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                      target="_blank"
+                    >
+                      <Img src={"/images/image-icon.png"} />
+                      <div>{img}</div>
+                    </StyledLink>
+                    {!isAssignedProjects && (
+                      <Modal>
+                        <Modal.Open opens="delete-project-attachment">
+                          <MdDelete
+                            color="red"
+                            size={"2rem"}
+                            cursor={"pointer"}
+                          />
+                        </Modal.Open>
+                        <Modal.Window name={"delete-project-attachment"}>
+                          <ConfirmDelete />
+                        </Modal.Window>
+                      </Modal>
+                    )}
                   </TableData>
                 ))}
               </div>
@@ -236,40 +267,50 @@ function Project() {
                     <img src="/images/pdf-icon.png" alt="icon for pdfs" />
                     <div>Pdfs</div>
                   </TC>
-                  <Modal>
-                    <Modal.Open opens="upload-project-attachment">
-                      <IconContainer>
-                        <StyledBsCloudPlusFill size={"2rem"} color="blue" />
-                        <HoverText>Upload file</HoverText>
-                      </IconContainer>
-                    </Modal.Open>
-                    <Modal.Window name={"upload-project-attachment"}>
-                      <UploadFile />
-                    </Modal.Window>
-                  </Modal>
-                </TableHead>
-                {project.attachments.pdfs.map((pdf, index) => (
-                  <TableData key={index}>
-                    <StyledLink
-                      to={`${pdf}`}
-                      style={{ textDecoration: "none", color: "inherit" }}
-                    >
-                      <Img src="/images/pdf-placeholder.png" />
-                      <div>name of pdf</div>
-                    </StyledLink>
-
+                  {!isAssignedProjects && (
                     <Modal>
-                      <Modal.Open opens="delete-project-attachment">
-                        <MdDelete
-                          color="red"
-                          size={"2rem"}
-                          cursor={"pointer"}
-                        />
+                      <Modal.Open opens="upload-project-attachment">
+                        <IconContainer>
+                          <StyledBsCloudPlusFill size={"2rem"} color="blue" />
+                          <HoverText>Upload file</HoverText>
+                        </IconContainer>
                       </Modal.Open>
-                      <Modal.Window name={"delete-project-attachment"}>
-                        <ConfirmDelete />
+                      <Modal.Window name={"upload-project-attachment"}>
+                        <UploadFile
+                          fileType={"pdf"}
+                          id={data._id}
+                          isLoading={isAddingAsset}
+                          mutationFn={mutate}
+                        />
                       </Modal.Window>
                     </Modal>
+                  )}
+                </TableHead>
+                {data.pdfs.map((pdf, index) => (
+                  <TableData key={index}>
+                    <StyledLink
+                      to={`http://127.0.0.1:9000/uploads/pdfs/${pdf}`}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                      target="_blank"
+                    >
+                      <Img src="/images/pdf-placeholder.png" />
+                      <div>{pdf}</div>
+                    </StyledLink>
+
+                    {!isAssignedProjects && (
+                      <Modal>
+                        <Modal.Open opens="delete-project-attachment">
+                          <MdDelete
+                            color="red"
+                            size={"2rem"}
+                            cursor={"pointer"}
+                          />
+                        </Modal.Open>
+                        <Modal.Window name={"delete-project-attachment"}>
+                          <ConfirmDelete />
+                        </Modal.Window>
+                      </Modal>
+                    )}
                   </TableData>
                 ))}
               </div>

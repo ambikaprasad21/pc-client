@@ -8,14 +8,16 @@ import { MdVerifiedUser } from "react-icons/md";
 import Editor from "../components/Editor";
 import Button from "./Button";
 import LazyImage from "./../utility/LazyImage";
-
-// import { Editor, EditorState } from "draft-js";
-// import "draft-js/dist/Draft.css";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createComment, getComments } from "../services/functions/commentFn";
+import SpinnerSm from "./SpinnerSm";
+import { formatDistanceToNow } from "date-fns";
+import toast from "react-hot-toast";
+import { useUser } from "../context/UserContext";
 
 const StyledDiv = styled.div`
   display: flex;
-  gap: 4rem;
-  /* padding: 5rem 4rem; */
+  justify-content: space-between;
 `;
 
 const StyledComments = styled.div`
@@ -68,7 +70,6 @@ const NoComments = styled.div`
   }
 
   img {
-    /* align-self: center; */
     width: 50%;
   }
   p {
@@ -88,47 +89,81 @@ const CommentBox = styled.div`
 `;
 
 function Comments() {
-  const { tid } = useParams();
-  const [comments, setComments] = useState([]);
+  // const [comments, setComments] = useState([]);
   const [typeComment, setTypeComment] = useState("");
+  const { user } = useUser();
   // const [editorState, setEditorState] = useState(() =>
   //   EditorState.createEmpty()
   // );
+  const { taskId } = useParams();
+  const { data: comments, isLoading } = useQuery({
+    queryKey: ["comments"],
+    queryFn: () => getComments(taskId),
+  });
 
-  useEffect(() => {
-    const filteredComments = commentsData.filter((el) => el.taskId === +tid);
-    setComments(filteredComments);
-  }, [tid]);
+  const queryClient = useQueryClient();
 
+  const { isLoading: commenting, mutate } = useMutation({
+    mutationKey: ["comments"],
+    mutationFn: createComment,
+    onSuccess: () => {
+      toast.success("Addedd comment successfully.");
+      queryClient.invalidateQueries(["comments"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  if (isLoading) return <SpinnerSm />;
   return (
     <StyledDiv>
       {comments && comments.length !== 0 && (
         <StyledComments>
-          {comments.map((comment) => (
-            <CommentData key={comment.id} type="horizontal">
-              <div>
-                <Avatar
-                  src={comment.photo}
-                  size={"small"}
-                  name={comment.userName}
-                />
-              </div>
+          {comments.map((comment) => {
+            if (!comment.author && !comment.manager) return null;
 
-              <Row>
-                <Row type="horizontal">
+            const userName = comment.author
+              ? `${comment.author.user.firstName} ${comment.author.user.lastName}`
+              : `${comment.manager.firstName} ${comment.manager.lastName}`;
+            return (
+              <CommentData key={comment._id} type="horizontal">
+                <div>
+                  <Avatar
+                    src={
+                      comment.author
+                        ? comment.user?.photo
+                        : comment.manager?.photo
+                    }
+                    size={"small"}
+                    name={userName}
+                  />
+                </div>
+
+                <Row>
                   <Row type="horizontal">
-                    <Username>{comment.userName}</Username>
-                    <Time>{comment.time}</Time>
+                    <Row type="horizontal">
+                      <Username>{userName}</Username>
+                      <Time>
+                        {formatDistanceToNow(new Date(comment.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </Time>
+                    </Row>
+                    <Role>
+                      <MdVerifiedUser />
+                      <div>
+                        {comment.author ? comment.author.role : "Manager"}
+                      </div>
+                    </Role>
                   </Row>
-                  <Role>
-                    <MdVerifiedUser />
-                    <div>{comment.role}</div>
-                  </Role>
+                  <StyledArticle
+                    dangerouslySetInnerHTML={{ __html: comment.text }}
+                  />
                 </Row>
-                <StyledArticle>{comment.text}</StyledArticle>
-              </Row>
-            </CommentData>
-          ))}
+              </CommentData>
+            );
+          })}
         </StyledComments>
       )}
 
@@ -154,9 +189,9 @@ function Comments() {
           <Button
             variation={"secondary"}
             size="medium"
-            onClick={() => console.log(typeComment)}
+            onClick={() => mutate({ taskId, typeComment, email: user.email })}
           >
-            Submit
+            {commenting ? <SpinnerSm /> : "Submit"}
           </Button>
         </div>
       </CommBtn>

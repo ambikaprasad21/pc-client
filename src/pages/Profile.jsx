@@ -101,7 +101,11 @@ function Profile() {
   return (
     <div className={styles.section}>
       <div className={styles.left}>
-        <Avatar src={user.photo} size={"large"} name={"Jessica Doe"} />
+        <Avatar
+          src={user.photo}
+          size={"large"}
+          name={`${user.firstName} ${user.lastName}`}
+        />
         <p className={styles.name}>{`${user.firstName} ${user.lastName}`}</p>
         <p className={styles.mail}>{user.email}</p>
         <Modal>

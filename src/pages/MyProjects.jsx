@@ -10,6 +10,10 @@ import projectData from "./../data/projectData";
 import Modal from "../ui/Modal";
 import CreateProject from "../modalwindows/CreateProject";
 import EditProject from "./../modalwindows/EditProject";
+import { getAllProjects } from "../services/functions/projectFn";
+import { useQuery } from "@tanstack/react-query";
+import SpinnerSm from "../ui/SpinnerSm";
+import { formatDate } from "../utility/formatDate";
 
 const StyledDiv = styled.div`
   max-width: 120rem;
@@ -137,11 +141,24 @@ const ProgCont = styled.div`
   gap: 5px;
 `;
 
+const NoProject = styled.p`
+  font-size: 2rem;
+`;
+
 function MyProjects() {
-  const [projects, setProjects] = useState(projectData);
+  // const [projects, setProjects] = useState(null);
   const [showMenu, setShowMenu] = useState(null);
   const menuRef = useRef(null);
   const navigate = useNavigate();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["projects"],
+    queryFn: getAllProjects,
+  });
+
+  // useEffect(() => {
+  //   setProjects(data);
+  // }, [data]);
 
   const toggleMenu = (id, event) => {
     event.stopPropagation();
@@ -165,6 +182,8 @@ function MyProjects() {
     };
   }, []);
 
+  if (isLoading) return <SpinnerSm />;
+
   return (
     <StyledDiv>
       <StyledCreateProject>
@@ -180,7 +199,8 @@ function MyProjects() {
         </Modal>
       </StyledCreateProject>
       <ProjectItems>
-        {projects.map((el) => (
+        {data.length === 0 && <NoProject>Start a new project 🔥</NoProject>}
+        {data.map((el) => (
           <ProjectItem
             onClick={() => navigate(`/my-projects/${el.id}`)}
             key={el.id}
@@ -210,7 +230,7 @@ function MyProjects() {
                 <div>
                   <Title size="small">
                     <div>Progress</div>
-                    <div>{el.progress}%</div>
+                    <div>{el.progress} %</div>
                   </Title>
                 </div>
                 <Progress progress={el.progress} />
@@ -219,7 +239,7 @@ function MyProjects() {
               <Manager>
                 <b>managed by :</b>
                 <span> </span>
-                {el.manager}
+                {el.managerName}
               </Manager>
               <TaskDeadline>
                 <Task>
@@ -229,7 +249,7 @@ function MyProjects() {
                     {`${el.tasks.length}` > 1 ? "s" : ""}
                   </div>
                 </Task>
-                <Deadline>{el.deadline}</Deadline>
+                <Deadline>{formatDate(el.deadline)}</Deadline>
               </TaskDeadline>
             </Row>
           </ProjectItem>

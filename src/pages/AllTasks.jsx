@@ -16,10 +16,15 @@ import {
 import { AiFillWechat } from "react-icons/ai";
 import { MdAttachFile } from "react-icons/md";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Priority from "../ui/Priority";
 import styled, { css } from "styled-components";
 import Progress from "../ui/Progress";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { deleteTaskFn, getAllTasks } from "../services/functions/taskFn";
+import SpinnerSm from "../ui/SpinnerSm";
+import { formatDate } from "../utility/formatDate";
+import toast from "react-hot-toast";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -184,10 +189,30 @@ const IconSvg = styled.div`
 `;
 
 function AllTasks() {
-  const [allTask, setAllTask] = useState(taskData);
+  // const [allTask, setAllTask] = useState(taskData);
+  const { projectId } = useParams();
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(null);
   const menuRef = useRef(null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["allTasks", projectId],
+    queryFn: () => getAllTasks(projectId),
+  });
+
+  const queryClient = useQueryClient();
+
+  const { isLoading: deletingTask, mutate } = useMutation({
+    mutationKey: ["allTasks"],
+    mutationFn: deleteTaskFn,
+    onSuccess: () => {
+      toast.success("Successfully deleted task.");
+      queryClient.invalidateQueries(["allTasks"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   const toggleMenu = (id, e) => {
     e.stopPropagation();
@@ -211,6 +236,7 @@ function AllTasks() {
     };
   }, []);
 
+  if (isLoading) return <SpinnerSm />;
   return (
     <StyledDiv>
       <Row type="horizontal">
@@ -218,7 +244,7 @@ function AllTasks() {
           Icon={BsBriefcaseFill}
           svgc={"3F8EFC"}
           svgbgc={"E3E9FF"}
-          number={allTask.length}
+          number={data?.tasks.length}
         >
           Total tasks
         </SummaryCards>
@@ -226,13 +252,7 @@ function AllTasks() {
           Icon={BsCheck2All}
           svgc={"53FF16"}
           svgbgc={"E5FFE3"}
-          number={allTask.reduce((acc, currval) => {
-            if (currval.status === "completed") {
-              acc++;
-            }
-
-            return acc;
-          }, 0)}
+          number={data?.completed}
         >
           Completed
         </SummaryCards>
@@ -240,13 +260,7 @@ function AllTasks() {
           Icon={BsFillPauseFill}
           svgc={"FF58DA"}
           svgbgc={"FFE3FE"}
-          number={allTask.reduce((acc, currval) => {
-            if (currval.status === "in-progress") {
-              acc++;
-            }
-
-            return acc;
-          }, 0)}
+          number={data?.inProgress}
         >
           In-progress
         </SummaryCards>
@@ -254,35 +268,33 @@ function AllTasks() {
           Icon={BsInfinity}
           svgc={"F8202D"}
           svgbgc={"FEE8EA"}
-          number={allTask.reduce((acc, currval) => {
-            if (currval.status === "pending") {
-              acc++;
-            }
-
-            return acc;
-          }, 0)}
+          number={data?.pending}
         >
           Pending
         </SummaryCards>
       </Row>
       <Container>
-        {allTask.map((task) => (
+        {data?.tasks.map((task) => (
           <ContainerItem
-            onClick={() => navigate(`/project/1/task/${task.id}/info`)}
-            key={task.id}
+            onClick={() =>
+              navigate(`/project/${projectId}/task/${task._id}/info`)
+            }
+            key={task._id}
           >
             <TopDiv>
-              <Priority variation={task.priority}>
-                {task.priority.toUpperCase()}
+              <Priority variation={task.priorityLevel.toLowerCase()}>
+                {task.priorityLevel.toUpperCase()}
               </Priority>
               <IconWrapper
-                onClick={(e) => toggleMenu(task.id, e)}
+                onClick={(e) => toggleMenu(task._id, e)}
                 ref={menuRef}
               >
                 <BsThreeDotsVertical />
-                <Menu show={showMenu === task.id}>
+                <Menu show={showMenu === task._id}>
                   <MenuItem>Edit</MenuItem>
-                  <MenuItem>Delete</MenuItem>
+                  <MenuItem onClick={() => mutate(task._id)}>
+                    {deletingTask ? "deleting..." : "Delete"}
+                  </MenuItem>
                 </Menu>
               </IconWrapper>
             </TopDiv>
@@ -292,48 +304,40 @@ function AllTasks() {
                 <div>
                   <Title size="small">
                     <div>Progress</div>
-                    <div>{task.progress}%</div>
+                    <div>{Math.ceil(task.progress)} %</div>
                   </Title>
                 </div>
-                <Progress progress={task.progress} />
+                <Progress progress={Math.ceil(task.progress)} />
               </ProgCont>
               <Deadline>
                 <span>Deadline :</span>
-                <time>{task.deadline}</time>
+                <time>{formatDate(task.deadline)}</time>
               </Deadline>
             </MidDiv>
             <BottomDiv>
               <AvatarContainer>
-                {task.members.slice(0, 3).map((item) => (
+                {task.taskMembers.slice(0, 3).map((item) => (
                   <Avatar
-                    src={item.photo}
+                    src={item.member.user?.photo}
                     key={item.id}
-                    name={item.fullName}
+                    name={`${item.member.user.firstName} ${item.member.user.lastName}`}
                     size={"small"}
                   />
                 ))}
-                {task.members.length > 3 && (
-                  <RemainingCount>+{task.members.length - 3}</RemainingCount>
+                {task.taskMembers.length > 3 && (
+                  <RemainingCount>
+                    +{task.taskMembers.length - 3}
+                  </RemainingCount>
                 )}
               </AvatarContainer>
               <IconSvgContainer>
                 <IconSvg>
                   <AiFillWechat />
-                  <div>
-                    {commentData.reduce((acc, currval) => {
-                      if (currval.taskId === task.id) {
-                        acc++;
-                      }
-                      return acc;
-                    }, 0)}
-                  </div>
+                  <div>{task.comments}</div>
                 </IconSvg>
                 <IconSvg>
                   <MdAttachFile />
-                  <div>
-                    {task.attachments.images.length +
-                      task.attachments.pdfs.length}
-                  </div>
+                  <div>{task.images.length + task.pdfs.length}</div>
                 </IconSvg>
               </IconSvgContainer>
             </BottomDiv>

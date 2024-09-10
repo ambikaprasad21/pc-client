@@ -9,6 +9,10 @@ import taskData from "../data/taskData";
 import Modal from "./Modal";
 import UploadFile from "../modalwindows/UploadFile";
 import ConfirmDelete from "../modalwindows/ConfirmDelete";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import SpinnerSm from "./SpinnerSm";
+import { addAssetToTaskFn, getTaskById } from "../services/functions/taskFn";
+import toast from "react-hot-toast";
 
 const TableHead = styled.div`
   display: flex;
@@ -88,22 +92,41 @@ const StyledBsCloudPlusFill = styled(BsCloudPlusFill)`
 `;
 
 function Assets() {
-  const [task, setTask] = useState(null);
+  // const [task, setTask] = useState(null);
+  const { taskId } = useParams();
+  const { data, isLoading } = useQuery({
+    queryKey: ["taskById"],
+    queryFn: () => getTaskById(taskId),
+  });
 
-  const { tid } = useParams();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    function getTaskById(tid) {
-      setTask(taskData.find((item) => item.id === +tid));
-      console.log(task);
-    }
+  const { isLoading: addingAsset, mutate } = useMutation({
+    mutationKey: ["taskById"],
+    mutationFn: addAssetToTaskFn,
+    onSuccess: () => {
+      toast.success("Addedd asset successfully.");
+      queryClient.invalidateQueries(["taskById"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
-    getTaskById(tid);
-  }, [tid]);
+  // useEffect(() => {
+  //   function getTaskById(tid) {
+  //     setTask(taskData.find((item) => item.id === +tid));
+  //     console.log(task);
+  //   }
+
+  //   getTaskById(tid);
+  // }, [tid]);
+
+  if (isLoading) return <SpinnerSm />;
 
   return (
     <Row>
-      {task && (
+      {data && (
         <>
           <div>
             <TableHead>
@@ -119,17 +142,23 @@ function Assets() {
                   </IconContainer>
                 </Modal.Open>
                 <Modal.Window name={"upload-project-attachment"}>
-                  <UploadFile />
+                  <UploadFile
+                    fileType={"image"}
+                    id={data._id}
+                    isLoading={addingAsset}
+                    mutationFn={mutate}
+                  />
                 </Modal.Window>
               </Modal>
             </TableHead>
-            {task.attachments["images"].map((img, index) => (
+            {data.images.map((img, index) => (
               <TableData key={index}>
                 <StyledLink
-                  to={`${img}`}
+                  to={`http://127.0.0.1:9000/uploads/images/${img}`}
                   style={{ textDecoration: "none", color: "inherit" }}
+                  target="_blank"
                 >
-                  <Img src={img} />
+                  <Img src={"/images/image-icon.png"} />
                   <div>{img}</div>
                 </StyledLink>
                 <Modal>
@@ -157,18 +186,24 @@ function Assets() {
                   </IconContainer>
                 </Modal.Open>
                 <Modal.Window name={"upload-project-attachment"}>
-                  <UploadFile />
+                  <UploadFile
+                    fileType={"pdf"}
+                    id={data._id}
+                    isLoading={addingAsset}
+                    mutationFn={mutate}
+                  />
                 </Modal.Window>
               </Modal>
             </TableHead>
-            {task.attachments.pdfs.map((pdf, index) => (
+            {data.pdfs.map((pdf, index) => (
               <TableData key={index}>
                 <StyledLink
-                  to={`${pdf}`}
+                  to={`http://127.0.0.1:9000/uploads/pdfs/${pdf}`}
                   style={{ textDecoration: "none", color: "inherit" }}
+                  target="_blank"
                 >
                   <Img src="/images/pdf-placeholder.png" />
-                  <div>name of pdf</div>
+                  <div>{pdf}</div>
                 </StyledLink>
 
                 <Modal>

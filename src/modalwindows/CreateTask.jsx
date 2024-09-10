@@ -29,7 +29,12 @@ const File = styled.div`
 import Select from "react-select";
 import styled from "styled-components";
 import Button from "../ui/Button";
-function CreateTask({ onCloseModal }) {
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getMemberFn } from "../services/functions/memberFn";
+import { createTaskFn } from "../services/functions/taskFn";
+import toast from "react-hot-toast";
+import SpinnerSm from "../ui/SpinnerSm";
+function CreateTask({ onCloseModal, id }) {
   const {
     register,
     handleSubmit,
@@ -37,6 +42,24 @@ function CreateTask({ onCloseModal }) {
     setValue,
     formState: { errors },
   } = useForm();
+
+  const { data: members } = useQuery({
+    queryKey: ["members"],
+    queryFn: getMemberFn,
+  });
+  const queryClient = useQueryClient();
+
+  const { isLoading, mutate } = useMutation({
+    mutationKey: ["allTasks"],
+    mutationFn: createTaskFn,
+    onSuccess: () => {
+      toast.success("Task created successfully");
+      queryClient.invalidateQueries(["allTasks"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   const [fileErrors, setFileErrors] = useState({});
 
@@ -66,20 +89,48 @@ function CreateTask({ onCloseModal }) {
 
   function onSubmit(newData) {
     console.log(newData);
+    const formData = new FormData();
+    formData.append("title", newData.title);
+    formData.append("description", newData.description);
+    formData.append("deadline", newData.deadline);
+    formData.append("priorityLevel", newData.priority.value);
+    newData.members.forEach((member) => {
+      formData.append(`members`, member.value);
+    });
+    if (newData.imagefile) {
+      formData.append("image", newData.imagefile);
+    }
+    if (newData.pdffile) {
+      formData.append("pdf", newData.pdffile);
+    }
+    console.log(formData);
+    mutate({ id, formData });
   }
 
   // Sample options
-  const memberOptions = [
-    { value: "1", label: "Alice" },
-    { value: "2", label: "Bob" },
-    { value: "3", label: "Charlie" },
-    { value: "4", label: "Diana" },
-  ];
+  // const memberOptions = [
+  //   { value: "1", label: "Alice" },
+  //   { value: "2", label: "Bob" },
+  //   { value: "3", label: "Charlie" },
+  //   { value: "4", label: "Diana" },
+  // ];
 
+  const memberOptions = members?.map((member) => {
+    return {
+      value: member._id,
+      label: `${member.user.firstName} ${member.user.lastName}`,
+    };
+  });
+
+  const priorityOptions = [
+    { value: "Low", label: "Low" },
+    { value: "Medium", label: "Medium" },
+    { value: "High", label: "High" },
+  ];
   return (
     <div
       style={{
-        padding: "0 2rem",
+        // padding: "0 2rem",
         width: "fit-content",
         display: "flex",
         flexDirection: "column",
@@ -89,17 +140,17 @@ function CreateTask({ onCloseModal }) {
     >
       <div
         style={{
-          width: "1rem",
-          height: "1rem",
+          width: "2rem",
+          height: "2rem",
           color: "#3F8EFC",
-          padding: "1.4rem",
+          padding: "2rem",
           borderRadius: "50%",
           backgroundColor: "#E3E9FF",
           position: "relative",
         }}
       >
         <FaBriefcase
-          size={"1.4rem"}
+          size={"2rem"}
           style={{
             position: "absolute",
             top: "50%",
@@ -110,8 +161,12 @@ function CreateTask({ onCloseModal }) {
       </div>
 
       <Row>
-        <p style={{ color: "#7B7979" }}>Create new task</p>
-        <p style={{ color: "#AFAEAE" }}>Enter details for this task</p>
+        <p style={{ color: "#7B7979", fontSize: "1.4rem", fontWeight: "550" }}>
+          Create new task
+        </p>
+        <p style={{ color: "#AFAEAE", fontSize: "1.2rem", fontWeight: "500" }}>
+          Enter details for this task
+        </p>
       </Row>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Row>
@@ -132,23 +187,33 @@ function CreateTask({ onCloseModal }) {
             placeholder="Task description"
           />
         </Row>
-        <div>
+        <Row>
           <label htmlFor="taskDeadline">Deadline</label>
+          <Input
+            type="date"
+            id="deadline"
+            {...register("deadline")}
+            placeholder="YYYY-MM-DD"
+          />
+          {errors.deadline && <span>{errors.deadline.message}</span>}
+        </Row>
+        <div>
+          <label htmlFor="taskPriority">Priority</label>
           <Controller
-            name="deadline"
+            name="priority"
             control={control}
-            rules={{ required: "Deadline is required" }}
+            rules={{ required: "Task must have a priority" }}
             render={({ field }) => (
-              <DatePicker
-                selected={field.value}
-                onChange={(date) => field.onChange(date)}
-                dateFormat="yyyy/MM/dd"
-                placeholderText="Select a deadline"
-                {...field}
+              <Select
+                options={priorityOptions}
+                value={field.value}
+                onChange={(selectedOptions) => field.onChange(selectedOptions)}
+                getOptionValue={(option) => option.value}
+                getOptionLabel={(option) => option.label}
               />
             )}
           />
-          {errors.deadline && <span>{errors.deadline.message}</span>}
+          {errors.priority && <span>{errors.priority.message}</span>}
         </div>
 
         <div>
@@ -222,7 +287,9 @@ function CreateTask({ onCloseModal }) {
           </div>
         </div>
 
-        <div>
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}
+        >
           <Button
             variation="primary"
             size="medium"
@@ -232,7 +299,7 @@ function CreateTask({ onCloseModal }) {
             Cancel
           </Button>
           <Button variation="secondary" size="medium">
-            Create task
+            {isLoading ? <SpinnerSm /> : "Create task"}
           </Button>
         </div>
       </form>

@@ -31,7 +31,11 @@ function AuthButtons() {
             to={"/dashboard"}
             style={{ color: "inherit", textDecoration: "none" }}
           >
-            <Avatar size={"small"} src={"/images/z.jpg"} />
+            <Avatar
+              size={"small"}
+              src={user?.photo}
+              name={`${user.firstName} ${user.lastName}`}
+            />
           </Link>
         </Row>
       )}

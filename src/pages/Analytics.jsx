@@ -1,18 +1,22 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import html2canvas from "html2canvas";
-import { useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import styled from "styled-components";
-import Chart from "chart.js/auto";
+import Chart from "chart.js/auto"; //neccessary do not remove it
 import { Doughnut, Bar } from "react-chartjs-2";
-import { differenceInDays, parse } from "date-fns";
+import { differenceInDays } from "date-fns";
 
-import reportData from "../data/reportData";
+// import reportData from "../data/reportData";
 import Row from "../ui/Row";
 import Button from "../ui/Button";
 
-import projectReportData from "../data/projectReportData";
+// import projectReportData from "../data/projectReportData";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { useQuery } from "@tanstack/react-query";
+import { getAnalyticsData } from "../services/functions/analyticsFn";
+import SpinnerSm from "../ui/SpinnerSm";
+import { formatDate } from "../utility/formatDate";
 
 const HeadBtn = styled.div`
   display: flex;
@@ -58,17 +62,35 @@ const DLI = styled.div`
   }
 `;
 
+const Notasks = styled.p`
+  font-size: 2rem;
+  font-weight: 300;
+  background-color: #ccc;
+  padding: 0 2rem;
+`;
+
 function Analytics() {
   const containerRef = useRef(null);
+  const [btnText, setBtnText] = useState("Download report");
+  const { projectId } = useParams();
+  const { data, isLoading } = useQuery({
+    queryKey: ["analyticsData"],
+    queryFn: () => getAnalyticsData(projectId),
+  });
 
   function onGeneratePdf() {
+    setBtnText("Preparing...");
     if (containerRef.current) {
       html2canvas(containerRef.current).then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
-        generatePdf(projectReportData, imgData);
+        generatePdf(data, imgData).then(() => {
+          setBtnText("Downloading...");
+          setTimeout(() => {
+            setBtnText("Download report");
+          }, 1000);
+        });
       });
     }
-    // generatePdf(projectReportData);
   }
 
   const doughnutData = {
@@ -76,11 +98,7 @@ function Analytics() {
     datasets: [
       {
         label: "Task Progress",
-        data: [
-          (reportData.pending / reportData.totalTask) * 100,
-          (reportData["in-progress"] / reportData.totalTask) * 100,
-          (reportData.completed / reportData.totalTask) * 100,
-        ],
+        data: [data?.pendingTasks, data?.inProgressTasks, data?.completedTasks],
         backgroundColor: ["#E14141", "#3F8EFC", "#53FF16"],
         hoverOffset: 4,
       },
@@ -99,7 +117,9 @@ function Analytics() {
           label: function (tooltipItem) {
             const label = doughnutData.labels[tooltipItem.dataIndex];
             const value = doughnutData.datasets[0].data[tooltipItem.dataIndex];
-            return `Task ${label}: ${value / reportData.totalTask}`;
+            return `Task ${label}: ${
+              (value / data?.totalTask).toFixed(2) * 100
+            }%`;
           },
         },
       },
@@ -112,9 +132,9 @@ function Analytics() {
       {
         label: "Task Priority",
         data: [
-          reportData.lowCount,
-          reportData.mediumCount,
-          reportData.highCount,
+          data?.lowPriorityCountTask,
+          data?.mediumPriorityCountTask,
+          data?.highPriorityTask,
         ],
         backgroundColor: ["#53FF16", "#3F8EFC", "#E14141"],
       },
@@ -158,10 +178,10 @@ function Analytics() {
   };
 
   const today = new Date();
-  const taskLabels = reportData.task.map((t) => t.taskTitle);
-  const progressData = reportData.task.map((t) => t.progress);
-  const deadlineData = reportData.task.map((t) =>
-    differenceInDays(parse(t.deadline, "dd MMMM yyyy", new Date()), today)
+  const taskLabels = data?.tasks.map((t) => t.title);
+  const progressData = data?.tasks.map((t) => t.progress);
+  const deadlineData = data?.tasks.map((t) =>
+    differenceInDays(new Date(t.deadline), today)
   );
 
   const taskBarData = {
@@ -223,6 +243,8 @@ function Analytics() {
 
   const [searchParams] = useSearchParams();
   const projectName = searchParams.get("project");
+
+  if (isLoading) return <SpinnerSm />;
   return (
     <Row gap="5rem">
       <HeadBtn>
@@ -232,52 +254,61 @@ function Analytics() {
           variation="secondary"
           size="medium"
           onClick={() => onGeneratePdf()}
+          disabled={btnText !== "Download report" || data.tasks.length === 0}
         >
-          Download report
+          {btnText}
         </Button>
       </HeadBtn>
-      <Container ref={containerRef}>
-        <Container1 style={{ height: "400px" }}>
-          <p>
-            The percentage of tasks that are completed, pending and in-progress
-          </p>
-          <Doughnut data={doughnutData} options={doughnutOptions} />
-          <DoughnutLegend>
-            <DLI>
-              <span style={{ backgroundColor: "#53FF16" }}></span>
-              <div>
-                {(reportData.completed / reportData.totalTask) * 100}% completed
-              </div>
-            </DLI>
-            <DLI>
-              <span style={{ backgroundColor: "#3F8EFC" }}></span>
-              <div>
-                {(reportData["in-progress"] / reportData.totalTask) * 100}%
-                progress
-              </div>
-            </DLI>
-            <DLI>
-              <span style={{ backgroundColor: "#E14141" }}></span>
-              <div>
-                {(reportData.pending / reportData.totalTask) * 100}% pending
-              </div>
-            </DLI>
-          </DoughnutLegend>
-        </Container1>
-        <Container1 style={{ height: "400px" }}>
-          <p>Distribution of tasks by there priority.</p>
-          <Bar data={barData} options={barOptions} />
-        </Container1>
-        <Container1 style={{ height: "400px", paddingBottom: "4rem" }}>
-          <p>Task Progress and Deadlines</p>
-          <Bar data={taskBarData} options={taskBarOptions} />
-        </Container1>
-      </Container>
+      {data.tasks.length === 0 && (
+        <Notasks>There are no task for this project</Notasks>
+      )}
+      {data.tasks.length !== 0 && (
+        <Container ref={containerRef}>
+          <Container1 style={{ height: "400px" }}>
+            <p>
+              The percentage of tasks that are completed, pending and
+              in-progress
+            </p>
+            <Doughnut data={doughnutData} options={doughnutOptions} />
+            <DoughnutLegend>
+              <DLI>
+                <span style={{ backgroundColor: "#53FF16" }}></span>
+                <div>
+                  {(data.completedTasks / data.totalTask).toFixed(2) * 100}%
+                  completed
+                </div>
+              </DLI>
+              <DLI>
+                <span style={{ backgroundColor: "#3F8EFC" }}></span>
+                <div>
+                  {(data.inProgressTasks / data.totalTask).toFixed(2) * 100}%
+                  progress
+                </div>
+              </DLI>
+              <DLI>
+                <span style={{ backgroundColor: "#E14141" }}></span>
+                <div>
+                  {(data.pendingTasks / data.totalTask).toFixed(2) * 100}%
+                  pending
+                </div>
+              </DLI>
+            </DoughnutLegend>
+          </Container1>
+          <Container1 style={{ height: "400px" }}>
+            <p>Distribution of tasks by there priority.</p>
+            <Bar data={barData} options={barOptions} />
+          </Container1>
+          <Container1 style={{ height: "400px", paddingBottom: "4rem" }}>
+            <p>Task Progress and Deadlines</p>
+            <Bar data={taskBarData} options={taskBarOptions} />
+          </Container1>
+        </Container>
+      )}
     </Row>
   );
 }
 
-const generatePdf = (project = {}, charts = "") => {
+const generatePdf = async (project = {}, charts = "") => {
   const doc = new jsPDF();
   const margin = 10;
   const pageWidth = doc.internal.pageSize.width;
@@ -309,7 +340,7 @@ const generatePdf = (project = {}, charts = "") => {
   doc.setFont("helvetica", "bold");
   doc.text("Project Name:", margin, yPosition);
   doc.setFont("helvetica", "normal");
-  doc.text(project.title, margin + 30, yPosition);
+  doc.text(project.projectTitle, margin + 30, yPosition);
 
   yPosition += 10;
 
@@ -319,7 +350,7 @@ const generatePdf = (project = {}, charts = "") => {
   doc.text("Manager:", margin, yPosition);
   doc.setFont("helvetica", "normal");
   doc.setTextColor("#3F8EFC");
-  doc.text(project.manager, margin + 25, yPosition);
+  doc.text(project.managerName, margin + 25, yPosition);
 
   yPosition += 10;
 
@@ -329,7 +360,7 @@ const generatePdf = (project = {}, charts = "") => {
   doc.text("Deadline:", margin, yPosition);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(0, 0, 0); // Reset color to black
-  doc.text(project.deadline, margin + 25, yPosition);
+  doc.text(formatDate(project.projectDeadline), margin + 25, yPosition);
 
   yPosition += 10;
 
@@ -340,7 +371,7 @@ const generatePdf = (project = {}, charts = "") => {
 
   // Handle long description
   const descriptionLines = doc.splitTextToSize(
-    project.description,
+    project.projectDescription,
     pageWidth - 5 * margin
   );
 
@@ -358,7 +389,7 @@ const generatePdf = (project = {}, charts = "") => {
   yPosition += 10;
 
   // Progress Bar
-  const progress = project.progress;
+  const progress = project.projectProgress;
   if (yPosition + 20 > doc.internal.pageSize.height - margin) {
     doc.addPage();
     yPosition = margin;
@@ -399,7 +430,7 @@ const generatePdf = (project = {}, charts = "") => {
   const tableData = project.tasks.map((task, index) => [
     index + 1, // Serial Number
     task.title,
-    task.deadline,
+    formatDate(task.deadline),
     `${task.progress}%`,
     task.members.map((member) => member.email).join(", "),
   ]);
@@ -420,9 +451,10 @@ const generatePdf = (project = {}, charts = "") => {
     },
   });
 
-  // Add Chart Image
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   if (charts) {
-    doc.addPage(); // Add a new page for the chart
+    doc.addPage();
 
     const img = new Image();
     img.src = charts;
@@ -433,7 +465,6 @@ const generatePdf = (project = {}, charts = "") => {
       const maxWidth = pageWidth - 2 * margin;
       const maxHeight = pageHeight - 2 * margin;
 
-      // Calculate scaling factor while maintaining aspect ratio
       let width = maxWidth;
       let height = (imgHeight * maxWidth) / imgWidth;
 
@@ -442,15 +473,14 @@ const generatePdf = (project = {}, charts = "") => {
         width = (imgWidth * maxHeight) / imgHeight;
       }
 
-      // Check if the image fits within the page
       const chartX = (pageWidth - width) / 2;
-      const chartY = margin; // Start from the top of the page
+      const chartY = margin;
 
       doc.addImage(charts, "PNG", chartX, chartY, width, height);
-      doc.save(`Project_Summary_${project.id}.pdf`);
+      doc.save(`Project_Summary_${project.projectTitle}.pdf`);
     };
   } else {
-    doc.save(`Project_Summary_${project.id}.pdf`);
+    doc.save(`Project_Summary_${project.projectTitle}.pdf`);
   }
 };
 

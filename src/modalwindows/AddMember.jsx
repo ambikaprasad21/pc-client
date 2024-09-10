@@ -3,15 +3,33 @@ import { FaUserTie } from "react-icons/fa";
 import Row from "../ui/Row";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addMemberFn } from "../services/functions/memberFn";
+import toast from "react-hot-toast";
+import SpinnerSm from "../ui/SpinnerSm";
 
-function AddMember({onCloseModal}) {
+function AddMember({ onCloseModal }) {
   const { register, handleSubmit, formState } = useForm();
+  const queryClient = useQueryClient();
+
+  const { isLoading, mutate } = useMutation({
+    mutationKey: ["members"],
+    mutationFn: addMemberFn,
+    onSuccess: () => {
+      toast.success("Member added successfully.");
+      queryClient.invalidateQueries(["members"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   const { errors } = formState;
 
   function onSubmit(data) {
     console.log(data);
     console.log(errors);
+    mutate(data);
   }
 
   function onError(errors) {
@@ -20,7 +38,7 @@ function AddMember({onCloseModal}) {
   return (
     <div
       style={{
-        padding: "0 2rem",
+        // padding: "0 1.4rem",
         width: "fit-content",
         display: "flex",
         flexDirection: "column",
@@ -30,17 +48,17 @@ function AddMember({onCloseModal}) {
     >
       <div
         style={{
-          width: "1rem",
-          height: "1rem",
+          width: "2rem",
+          height: "2rem",
           color: "#3F8EFC",
-          padding: "1.4rem",
+          padding: "2rem",
           borderRadius: "50%",
           backgroundColor: "#E3E9FF",
           position: "relative",
         }}
       >
         <FaUserTie
-          size={"1.4rem"}
+          size={"2rem"}
           style={{
             position: "absolute",
             top: "50%",
@@ -51,8 +69,12 @@ function AddMember({onCloseModal}) {
       </div>
 
       <Row>
-        <p style={{ color: "#7B7979" }}>Add new member</p>
-        <p style={{ color: "#AFAEAE" }}>Fill member information</p>
+        <p style={{ color: "#7B7979", fontSize: "1.4rem", fontWeight: "550" }}>
+          Add new member
+        </p>
+        <p style={{ color: "#AFAEAE", fontSize: "1.2rem", fontWeight: "500" }}>
+          Fill member information
+        </p>
       </Row>
       <form onSubmit={handleSubmit(onSubmit, onError)}>
         <Row>
@@ -101,13 +123,23 @@ function AddMember({onCloseModal}) {
           />
         </Row>
         <div
-          style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "1rem",
+            marginTop: "1rem",
+          }}
         >
-          <Button variation="primary" size="medium" type="reset" onClick={()=> onCloseModal()}>
+          <Button
+            variation="primary"
+            size="medium"
+            type="reset"
+            onClick={() => onCloseModal()}
+          >
             Cancel
           </Button>
           <Button variation="secondary" size="medium">
-            Add member
+            {isLoading ? <SpinnerSm /> : "Add member"}
           </Button>
         </div>
       </form>

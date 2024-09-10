@@ -3,6 +3,10 @@ import projectData from "../data/projectData";
 import Button from "../ui/Button";
 import Row from "../ui/Row";
 import styled from "styled-components";
+import { useQuery } from "@tanstack/react-query";
+import { getAllProjects } from "../services/functions/projectFn";
+import SpinnerSm from "../ui/SpinnerSm";
+import { formatDate } from "../utility/formatDate";
 // import generatePdf from "../utility/generatePdf";
 
 const Heading = styled.h2`
@@ -44,22 +48,37 @@ const Buttons = styled.div`
   display: flex;
   justify-content: space-between;
 `;
+
+const NoProject = styled.p`
+  font-size: 2rem;
+  font-weight: 300;
+  background-color: #ccc;
+  padding: 0 2rem;
+`;
+
 function AnalyticsList() {
   const navigate = useNavigate();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["projects"],
+    queryFn: getAllProjects,
+  });
+  if (isLoading) return <SpinnerSm />;
   return (
     <Row gap="3rem">
       <Heading>Analyze Projects</Heading>
       <Container>
-        {projectData.map((project) => (
-          <Project key={project.id}>
+        {data.length === 0 && <NoProject>There are no projects.</NoProject>}
+        {data.map((project) => (
+          <Project key={project._id}>
             <Title>{project.title}</Title>
-            <Deadline>{project.deadline}</Deadline>
+            <Deadline>{formatDate(project.deadline)}</Deadline>
             {/* <Buttons> */}
             <Button
               variation="primary"
               size="small"
               onClick={() =>
-                navigate(`${project.id}/?project=${project.title}`)
+                navigate(`${project._id}/?project=${project.title}`)
               }
             >
               Analyze

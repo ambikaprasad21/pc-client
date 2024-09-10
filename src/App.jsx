@@ -53,8 +53,11 @@ function App() {
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="my-projects" element={<MyProjects />} />
               <Route path="my-projects/:projectId" element={<Project />} />
-              <Route path="project/:pid/all-tasks" element={<AllTasks />} />
-              <Route path="project/:pid/task/:tid" element={<Task />}>
+              <Route
+                path="project/:projectId/all-tasks"
+                element={<AllTasks />}
+              />
+              <Route path="project/:pid/task/:taskId" element={<Task />}>
                 <Route path="info" element={<Info />} />
                 <Route path="assets" element={<Assets />} />
                 <Route path="task-members" element={<TaskMembers />} />
@@ -62,8 +65,12 @@ function App() {
               </Route>
               <Route path="members" element={<Members />} />
               <Route path="projects" element={<Projects />} />
+              <Route
+                path="projects/assigned/:projectId"
+                element={<Project />}
+              />
               <Route path="analytics" element={<AnalyticsList />} />
-              <Route path="analytics/:pid" element={<Analytics />} />
+              <Route path="analytics/:projectId" element={<Analytics />} />
               <Route path="trash" element={<Trash />} />
               <Route path="profile" element={<Profile />} />
               <Route path="messages" element={<Messages />} />

@@ -4,6 +4,8 @@ import { MdMenu, MdChat, MdNotifications } from "react-icons/md";
 import { Link } from "react-router-dom";
 import Avatar from "./Avatar";
 import { useUser } from "../context/UserContext";
+import { useQuery } from "@tanstack/react-query";
+import { getNotifications } from "../services/functions/notificationFn";
 
 const StyledHeader = styled.header`
   /* z-index: 10; */
@@ -23,15 +25,28 @@ const HeadOptions = styled.div`
 
 function AppHeader() {
   const { user } = useUser();
+  const { data: notifications, isLoading } = useQuery({
+    queryKey: ["notification"],
+    queryFn: getNotifications,
+  });
+
+  const unseenNotifications =
+    notifications?.filter((data) => !data.seen).length > 9
+      ? "9+"
+      : notifications?.filter((data) => !data.seen).length;
   return (
     <StyledHeader>
       <MdMenu size="2rem" />
 
       <HeadOptions>
         <MessageIcon newMessages={4} />
-        <NotifiIcon newNotifi={4} />
+        <NotifiIcon newNotifi={unseenNotifications} />
         <Link to={"profile"} title="User profile">
-          <Avatar src={user?.photo} name={"Test User"} size={"small"} />
+          <Avatar
+            src={user?.photo}
+            name={`${user.firstName} ${user.lastName}`}
+            size={"small"}
+          />
         </Link>
       </HeadOptions>
     </StyledHeader>

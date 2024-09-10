@@ -16,7 +16,8 @@ function SpinnerSm() {
       <Oval
         visible={true}
         height={"auto"}
-        color="#FFF"
+        color="#4F81F0"
+        secondaryColor="#ffffff"
         ariaLabel="oval-loading"
         wrapperStyle={{ maxWidth: "30%", maxHeight: "30%" }}
         wrapperClass=""

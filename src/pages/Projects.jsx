@@ -1,8 +1,16 @@
 import styled, { css } from "styled-components";
 import Row from "../ui/Row";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BsBriefcaseFill } from "react-icons/bs";
 import Progress from "../ui/Progress";
+import { useQuery } from "@tanstack/react-query";
+import {
+  getAllAssignedProjects,
+  getAllProjects,
+} from "../services/functions/projectFn";
+import SpinnerSm from "../ui/SpinnerSm";
+import { formatDate } from "../utility/formatDate";
+import { useNavigate } from "react-router-dom";
 
 const projectData = [
   {
@@ -179,15 +187,46 @@ const ProgCont = styled.div`
   gap: 5px;
 `;
 
+const NoProjects = styled.p`
+  font-size: 2rem;
+  font-weight: 300;
+  background-color: #ccc;
+  padding: 0 2rem;
+`;
+
 function Projects() {
-  const [projects, setProjects] = useState(projectData);
+  const navigate = useNavigate();
+  // const [projects, setProjects] = useState(null);
+
+  // function formDate(date) {
+  //   const currDate = new Date(date);
+  // }
+
+  const { data: projects, isLoading } = useQuery({
+    queryKey: ["assignedProjects"],
+    queryFn: getAllAssignedProjects,
+  });
+
+  // console.log(data);
+
+  // useEffect(() => {
+  //   setProjects(projectData);
+  // }, [projectData]);
+
+  if (isLoading) return <SpinnerSm />;
 
   return (
     <StyledDiv>
       <h2>Project Task Assigned</h2>
       <ProjectItems>
+        {projects.length === 0 && (
+          <NoProjects>There are no projects task assigned to you</NoProjects>
+        )}
         {projects.map((el) => (
-          <ProjectItem key={el.id}>
+          <ProjectItem
+            onClick={() => navigate(`/projects/assigned/${el._id}`)}
+            key={el._id}
+          >
             <Title>
               <div>{el.title}</div>
             </Title>
@@ -196,7 +235,7 @@ function Projects() {
                 <div>
                   <Title size="small">
                     <div>Progress</div>
-                    <div>{el.progress}%</div>
+                    <div>{el.progress} %</div>
                   </Title>
                 </div>
                 <Progress progress={el.progress} />
@@ -205,7 +244,7 @@ function Projects() {
               <Manager>
                 <b>managed by :</b>
                 <span> </span>
-                {el.manager}
+                {el.managerName}
               </Manager>
               <TaskDeadline>
                 <Task>
@@ -215,7 +254,7 @@ function Projects() {
                     {`${el.tasks.length}` > 1 ? "s" : ""}
                   </div>
                 </Task>
-                <Deadline>{el.deadline}</Deadline>
+                <Deadline>{formatDate(el.deadline)}</Deadline>
               </TaskDeadline>
             </Row>
           </ProjectItem>

@@ -1,6 +1,8 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useParams } from "react-router-dom";
 import styles from "./Task.module.css";
 import styled from "styled-components";
+import { useQuery } from "@tanstack/react-query";
+import { getTaskById } from "../services/functions/taskFn";
 
 const Container = styled.div`
   display: flex;
@@ -10,6 +12,12 @@ const Container = styled.div`
 `;
 
 function Task() {
+  const { taskId } = useParams();
+  const { data, isLoading } = useQuery({
+    queryKey: ["taskById"],
+    queryFn: () => getTaskById(taskId),
+  });
+  console.log(data);
   return (
     <Container>
       <nav className={styles.nav}>

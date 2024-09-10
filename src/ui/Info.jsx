@@ -3,6 +3,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import Button from "./Button";
+import { useQuery } from "@tanstack/react-query";
+import { getTaskById } from "../services/functions/taskFn";
+import SpinnerSm from "./SpinnerSm";
+import { formatDate } from "../utility/formatDate";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -59,25 +63,29 @@ const Deadline = styled.div`
 
 function Info() {
   const [task, setTask] = useState(null);
-  const { tid } = useParams();
 
-  useEffect(() => {
-    setTask(taskData.filter((el) => el.id === +tid));
-  }, [tid]);
+  const { taskId } = useParams();
+  const { data, isLoading } = useQuery({
+    queryKey: ["taskById"],
+    queryFn: () => getTaskById(taskId),
+  });
+
+  // useEffect(() => {
+  //   setTask(taskData.filter((el) => el.id === +tid));
+  // }, [tid]);
+
+  if (isLoading) return <SpinnerSm />;
+
   return (
     <StyledDiv>
       <TitleDesc>
-        <div>Test task title</div>
-        <p>
-          Lorem ipsum dolor sit amet consectetur. Massa sed sed commodo nisi
-          eget mauris elementum. Pellentesque aenean facilisi eget non in proin
-          tincidunt lectus.
-        </p>
+        <div>{data.title}</div>
+        <p>{data.description}</p>
       </TitleDesc>
       <Important>
         <Deadline>
           <div>Deadline</div>
-          <time>30 Aug 2024</time>
+          <time>{formatDate(data.deadline)}</time>
         </Deadline>
         <div>
           <Button variation="secondary" size="medium">

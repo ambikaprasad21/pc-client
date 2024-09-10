@@ -3,6 +3,7 @@ import { createContext } from "react";
 import { API } from "../utility/constant";
 import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 
 const UserContext = createContext();
 
@@ -13,6 +14,7 @@ export function UserContextProvider({ children }) {
     localStorage.getItem("prozverify")
   );
   const [searchParams] = useSearchParams();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (searchParams.get("demo")) {
@@ -49,9 +51,11 @@ export function UserContextProvider({ children }) {
   }, [prozVerify]);
 
   function handleLogout() {
+    queryClient.clear();
     localStorage.clear("prozverify");
     setUser(null);
     navigate("/", { replace: true });
+    window.location.reload(true);
   }
   return (
     <UserContext.Provider

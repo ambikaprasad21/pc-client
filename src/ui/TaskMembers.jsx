@@ -7,6 +7,8 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import Row from "./Row";
 import Modal from "./Modal";
 import MessageMember from "../modalwindows/MessageMember";
+import { useQuery } from "@tanstack/react-query";
+import SpinnerSm from "./SpinnerSm";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -127,10 +129,15 @@ const Label = styled.div`
   color: #cdcdd4;
 `;
 function TaskMembers() {
-  const { tid } = useParams();
   const [members, setMembers] = useState([]);
   const [showMenu, setShowMenu] = useState(null);
   const menuRef = useRef(null);
+
+  const { taskId } = useParams();
+  const { data, isLoading } = useQuery({
+    queryKey: ["taskById"],
+    queryFn: () => getTaskById(taskId),
+  });
 
   const toggleMenu = (id, event) => {
     event.stopPropagation();
@@ -154,20 +161,22 @@ function TaskMembers() {
     };
   }, []);
 
-  useEffect(() => {
-    setMembers(taskData.find((task) => task.id === +tid).members);
-  }, [tid]);
+  // useEffect(() => {
+  //   setMembers(taskData.find((task) => task.id === +tid).members);
+  // }, [tid]);
+
+  if (isLoading) return <SpinnerSm />;
   return (
     <StyledDiv>
-      {members &&
-        members.map((member) => (
-          <Member key={member.id}>
+      {data &&
+        data.taskMembers.map((member) => (
+          <Member key={member._id}>
             <IconWrapper
-              onClick={(event) => toggleMenu(member.id, event)}
+              onClick={(event) => toggleMenu(member._id, event)}
               ref={menuRef}
             >
               <BsThreeDotsVertical size={"1.4rem"} />
-              <Menu show={showMenu === member.id}>
+              <Menu show={showMenu === member._id}>
                 <Modal>
                   <Modal.Open opens="upload-pp">
                     <MenuItem>Message</MenuItem>
@@ -181,10 +190,14 @@ function TaskMembers() {
               </Menu>
             </IconWrapper>
             <Details>
-              <Avatar src={member?.photo} size={"medium"} />
+              <Avatar
+                src={member.member.user?.photo}
+                name={`${member.member.user.firstName} ${member.member.user.lastName}`}
+                size={"medium"}
+              />
               <NameMail>
-                <Name>{member.fullName}</Name>
-                <Email>{member.email}</Email>
+                <Name>{`${member.member.user.firstName} ${member.member.user.lastName}`}</Name>
+                <Email>{member.member.user.email}</Email>
               </NameMail>
               <Row>
                 <About>
@@ -192,7 +205,7 @@ function TaskMembers() {
                   Quisquam adipisci aliquam animi officiis neque ducimus
                   voluptatem debitis facilis modi.
                 </About>
-                <Experience>
+                {/* <Experience>
                   <NumLab>
                     <Number>{member.projects}</Number>
                     <Label>Project</Label>
@@ -201,7 +214,7 @@ function TaskMembers() {
                     <Number>{member.tasks}</Number>
                     <Label>Tasks</Label>
                   </NumLab>
-                </Experience>
+                </Experience> */}
               </Row>
             </Details>
           </Member>

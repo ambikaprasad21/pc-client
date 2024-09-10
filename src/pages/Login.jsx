@@ -58,7 +58,6 @@ function Login() {
 
       if (res.status === 200) {
         const data = await res.json();
-
         toast.success("Logged in successfully");
         setUser(data.data);
         setProzVerify(data.token);
