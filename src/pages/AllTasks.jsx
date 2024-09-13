@@ -25,6 +25,11 @@ import { deleteTaskFn, getAllTasks } from "../services/functions/taskFn";
 import SpinnerSm from "../ui/SpinnerSm";
 import { formatDate } from "../utility/formatDate";
 import toast from "react-hot-toast";
+import Modal from "../ui/Modal";
+import ConfirmDelete from "../modalwindows/ConfirmDelete";
+import EditTask from "../modalwindows/EditTask";
+import LazyImage from "../utility/LazyImage";
+import { useUser } from "../context/UserContext";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -90,7 +95,8 @@ const Menu = styled.div`
   border-radius: 8px;
   width: 12rem;
   overflow: hidden;
-  opacity: ${(props) => (props.show ? 1 : 0)};
+  /* opacity: ${(props) => (props.show ? 1 : 0)}; */
+  display: ${(props) => (props.show ? "block" : "none")};
   transform: ${(props) => (props.show ? "translateY(0)" : "translateY(-10px)")};
   transition: opacity 0.2s ease, transform 0.2s ease;
   z-index: 1;
@@ -188,8 +194,29 @@ const IconSvg = styled.div`
   font-size: 1.6rem;
 `;
 
+const NoTasks = styled.div`
+  display: flex;
+  flex: 2;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  span {
+    display: flex !important ;
+    justify-content: center;
+  }
+
+  img {
+    width: 50%;
+  }
+  p {
+    font-size: 1.8rem;
+  }
+`;
+
 function AllTasks() {
   // const [allTask, setAllTask] = useState(taskData);
+  const { user } = useUser();
   const { projectId } = useParams();
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(null);
@@ -236,7 +263,22 @@ function AllTasks() {
     };
   }, []);
 
+  const isManager = user.projectsCreated.some((id) => id === projectId);
+
   if (isLoading) return <SpinnerSm />;
+
+  if (!data || !data.tasks || data.tasks.length === 0) {
+    return (
+      <NoTasks>
+        <LazyImage
+          src={"/images/no-task.jpg"}
+          alt={"There are no tasks to work on."}
+        />
+        <p>There are no tasks to work on.</p>
+      </NoTasks>
+    );
+  }
+
   return (
     <StyledDiv>
       <Row type="horizontal">
@@ -285,18 +327,41 @@ function AllTasks() {
               <Priority variation={task.priorityLevel.toLowerCase()}>
                 {task.priorityLevel.toUpperCase()}
               </Priority>
-              <IconWrapper
-                onClick={(e) => toggleMenu(task._id, e)}
-                ref={menuRef}
-              >
-                <BsThreeDotsVertical />
-                <Menu show={showMenu === task._id}>
-                  <MenuItem>Edit</MenuItem>
-                  <MenuItem onClick={() => mutate(task._id)}>
-                    {deletingTask ? "deleting..." : "Delete"}
-                  </MenuItem>
-                </Menu>
-              </IconWrapper>
+              {isManager && (
+                <IconWrapper
+                  onClick={(e) => toggleMenu(task._id, e)}
+                  ref={menuRef}
+                >
+                  <BsThreeDotsVertical />
+                  <Menu
+                    show={showMenu === task._id}
+                    ref={showMenu === task._id ? menuRef : null}
+                  >
+                    <Modal>
+                      <Modal.Open opens="editTask">
+                        <MenuItem>Edit</MenuItem>
+                      </Modal.Open>
+                      <Modal.Window name={"editTask"}>
+                        <EditTask data={task} />
+                      </Modal.Window>
+                    </Modal>
+
+                    <Modal>
+                      <Modal.Open opens="deleteTask">
+                        <MenuItem>
+                          {deletingTask ? "deleting..." : "Delete"}
+                        </MenuItem>
+                      </Modal.Open>
+                      <Modal.Window name={"deleteTask"}>
+                        <ConfirmDelete
+                          isDeleting={deletingTask}
+                          onConfirmDelete={() => mutate(task._id)}
+                        />
+                      </Modal.Window>
+                    </Modal>
+                  </Menu>
+                </IconWrapper>
+              )}
             </TopDiv>
             <MidDiv>
               <Title size="medium">{task.title}</Title>

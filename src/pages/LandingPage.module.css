@@ -306,6 +306,22 @@
   color: #2701fc;
 }
 
+.pricing-note {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #555;
+  text-align: center;
+}
+
+.pricing-note p {
+  margin: 0;
+  line-height: 1.6;
+}
+
 /* question and answer */
 
 .qanda {

@@ -6,6 +6,7 @@ import Avatar from "./Avatar";
 import { useUser } from "../context/UserContext";
 import { useQuery } from "@tanstack/react-query";
 import { getNotifications } from "../services/functions/notificationFn";
+import { getAllMessageFn } from "../services/functions/messageFn";
 
 const StyledHeader = styled.header`
   /* z-index: 10; */
@@ -25,21 +26,31 @@ const HeadOptions = styled.div`
 
 function AppHeader() {
   const { user } = useUser();
-  const { data: notifications, isLoading } = useQuery({
+  const { data: notifications } = useQuery({
     queryKey: ["notification"],
     queryFn: getNotifications,
+  });
+
+  const { data: messagesData } = useQuery({
+    queryKey: ["messages"],
+    queryFn: getAllMessageFn,
   });
 
   const unseenNotifications =
     notifications?.filter((data) => !data.seen).length > 9
       ? "9+"
       : notifications?.filter((data) => !data.seen).length;
+
+  const unseenMessages =
+    messagesData?.filter((data) => !data.seen).length > 9
+      ? "9+"
+      : messagesData?.filter((data) => !data.seen).length;
   return (
     <StyledHeader>
       <MdMenu size="2rem" />
 
       <HeadOptions>
-        <MessageIcon newMessages={4} />
+        <MessageIcon newMessages={unseenMessages} />
         <NotifiIcon newNotifi={unseenNotifications} />
         <Link to={"profile"} title="User profile">
           <Avatar
@@ -53,7 +64,7 @@ function AppHeader() {
   );
 }
 
-const MessageIcon = ({ newMessages }) => {
+const MessageIcon = ({ newMessages = "" }) => {
   return (
     <Link
       to={"/messages"}
@@ -61,12 +72,14 @@ const MessageIcon = ({ newMessages }) => {
       title="messages"
     >
       <MdChat size="2.4rem" color="gray" />
-      {newMessages > 0 && <span className={styles.badge}>{newMessages}</span>}
+      {newMessages !== "" && (
+        <span className={styles.badge}>{newMessages}</span>
+      )}
     </Link>
   );
 };
 
-const NotifiIcon = ({ newNotifi }) => {
+const NotifiIcon = ({ newNotifi = "" }) => {
   return (
     <Link
       to={"/notifications"}
@@ -74,7 +87,7 @@ const NotifiIcon = ({ newNotifi }) => {
       title="notifications"
     >
       <MdNotifications size="2.4rem" color="gray" />
-      {newNotifi > 0 && <span className={styles.badge}>{newNotifi}</span>}
+      {newNotifi !== "" && <span className={styles.badge}>{newNotifi}</span>}
     </Link>
   );
 };

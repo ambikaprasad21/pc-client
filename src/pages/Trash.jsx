@@ -2,17 +2,27 @@ import styled from "styled-components";
 import Row from "../ui/Row";
 
 import { MdRestore, MdDelete } from "react-icons/md";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  deleteProjectFn,
+  getTrashedProjectsFn,
+  moveProjectOutFromTrashFn,
+} from "../services/functions/projectFn";
+import SpinnerSm from "../ui/SpinnerSm";
+import toast from "react-hot-toast";
+import Modal from "../ui/Modal";
+import ConfirmDelete from "../modalwindows/ConfirmDelete";
 
-const trashData = [
-  {
-    id: 1,
-    title: "Fullstack website",
-  },
-  {
-    id: 2,
-    title: "Fullstack website",
-  },
-];
+// const trashData = [
+//   {
+//     id: 1,
+//     title: "Fullstack website",
+//   },
+//   {
+//     id: 2,
+//     title: "Fullstack website",
+//   },
+// ];
 
 const Heading = styled.h1`
   font-size: 3rem;
@@ -63,6 +73,38 @@ const ResDel = styled.div`
 `;
 
 function Trash() {
+  const { data: trashData, isLoading } = useQuery({
+    queryKey: ["trashedProjects"],
+    queryFn: getTrashedProjectsFn,
+  });
+
+  const queryClient = useQueryClient();
+
+  const { isLoading: isRestoring, mutate: restore } = useMutation({
+    mutationKey: ["trashedProjects"],
+    mutationFn: moveProjectOutFromTrashFn,
+    onSuccess: () => {
+      toast.success("Project restored successfully.");
+      queryClient.invalidateQueries(["trashedProjects"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const { isLoading: isDeleting, mutate: deleteProject } = useMutation({
+    mutationKey: ["trashedProjects"],
+    mutationFn: deleteProjectFn,
+    onSuccess: () => {
+      toast.success("Project deleted successfully.");
+      queryClient.invalidateQueries(["trashedProjects"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  if (isLoading) return <SpinnerSm />;
   return (
     <Row>
       <Heading>All Your Trashed Projects</Heading>
@@ -78,9 +120,25 @@ function Trash() {
           <TableData key={el.id}>
             <div>{el.title}</div>
             <ResDel>
-              <MdRestore color="005ee3" />
+              {isRestoring ? (
+                <SpinnerSm />
+              ) : (
+                <MdRestore color="005ee3" onClick={() => restore(el.id)} />
+              )}
 
-              <MdDelete color="F8202D" />
+              {/* <MdDelete color="F8202D" /> */}
+
+              <Modal>
+                <Modal.Open opens="deleteProject">
+                  <MdDelete color="F8202D" />
+                </Modal.Open>
+                <Modal.Window name={"deleteProject"}>
+                  <ConfirmDelete
+                    isDeleting={isDeleting}
+                    onConfirmDelete={() => deleteProject(el.id)}
+                  />
+                </Modal.Window>
+              </Modal>
             </ResDel>
           </TableData>
         ))}

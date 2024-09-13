@@ -186,13 +186,15 @@ function Comments() {
           />
         </CommentBox>
         <div>
-          <Button
-            variation={"secondary"}
-            size="medium"
-            onClick={() => mutate({ taskId, typeComment, email: user.email })}
-          >
-            {commenting ? <SpinnerSm /> : "Submit"}
-          </Button>
+          {typeComment && (
+            <Button
+              variation={"secondary"}
+              size="medium"
+              onClick={() => mutate({ taskId, typeComment, email: user.email })}
+            >
+              {commenting ? <SpinnerSm /> : "Submit"}
+            </Button>
+          )}
         </div>
       </CommBtn>
     </StyledDiv>

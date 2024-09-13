@@ -11,8 +11,14 @@ import UploadFile from "../modalwindows/UploadFile";
 import ConfirmDelete from "../modalwindows/ConfirmDelete";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import SpinnerSm from "./SpinnerSm";
-import { addAssetToTaskFn, getTaskById } from "../services/functions/taskFn";
+import {
+  addAssetToTaskFn,
+  getTaskById,
+  removeAssetTaskFn,
+} from "../services/functions/taskFn";
 import toast from "react-hot-toast";
+import { useUser } from "../context/UserContext";
+import { ASSETAPI } from "../utility/constant";
 
 const TableHead = styled.div`
   display: flex;
@@ -92,7 +98,7 @@ const StyledBsCloudPlusFill = styled(BsCloudPlusFill)`
 `;
 
 function Assets() {
-  // const [task, setTask] = useState(null);
+  const { user } = useUser();
   const { taskId } = useParams();
   const { data, isLoading } = useQuery({
     queryKey: ["taskById"],
@@ -113,16 +119,21 @@ function Assets() {
     },
   });
 
-  // useEffect(() => {
-  //   function getTaskById(tid) {
-  //     setTask(taskData.find((item) => item.id === +tid));
-  //     console.log(task);
-  //   }
-
-  //   getTaskById(tid);
-  // }, [tid]);
+  const { isLoading: isDeleting, mutate: onDelete } = useMutation({
+    mutationKey: ["taskById"],
+    mutationFn: removeAssetTaskFn,
+    onSuccess: () => {
+      toast.success("File removed successfully.");
+      queryClient.invalidateQueries(["taskById"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   if (isLoading) return <SpinnerSm />;
+
+  const showUploadBtn = data && user.projectsCreated.includes(data.projectId);
 
   return (
     <Row>
@@ -134,39 +145,49 @@ function Assets() {
                 <img src="/images/image-icon.png" alt="icon for image" />
                 <div>Images</div>
               </TC>
-              <Modal>
-                <Modal.Open opens="upload-project-attachment">
-                  <IconContainer>
-                    <StyledBsCloudPlusFill size={"2rem"} color="blue" />
-                    <HoverText>Upload file</HoverText>
-                  </IconContainer>
-                </Modal.Open>
-                <Modal.Window name={"upload-project-attachment"}>
-                  <UploadFile
-                    fileType={"image"}
-                    id={data._id}
-                    isLoading={addingAsset}
-                    mutationFn={mutate}
-                  />
-                </Modal.Window>
-              </Modal>
+              {showUploadBtn && (
+                <Modal>
+                  <Modal.Open opens="upload-project-attachment">
+                    <IconContainer>
+                      <StyledBsCloudPlusFill size={"2rem"} color="blue" />
+                      <HoverText>Upload file</HoverText>
+                    </IconContainer>
+                  </Modal.Open>
+                  <Modal.Window name={"upload-project-attachment"}>
+                    <UploadFile
+                      fileType={"image"}
+                      id={data._id}
+                      isLoading={addingAsset}
+                      mutationFn={mutate}
+                    />
+                  </Modal.Window>
+                </Modal>
+              )}
             </TableHead>
             {data.images.map((img, index) => (
               <TableData key={index}>
                 <StyledLink
-                  to={`http://127.0.0.1:9000/uploads/images/${img}`}
+                  to={`${ASSETAPI}/uploads/images/${img.location}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                   target="_blank"
                 >
                   <Img src={"/images/image-icon.png"} />
-                  <div>{img}</div>
+                  <div>{img.name}</div>
                 </StyledLink>
                 <Modal>
                   <Modal.Open opens="delete-project-attachment">
                     <MdDelete color="red" size={"2rem"} cursor={"pointer"} />
                   </Modal.Open>
                   <Modal.Window name={"delete-project-attachment"}>
-                    <ConfirmDelete />
+                    <ConfirmDelete
+                      isDeleting={isDeleting}
+                      onConfirmDelete={() =>
+                        onDelete({
+                          id: taskId,
+                          fileName: img.location,
+                        })
+                      }
+                    />
                   </Modal.Window>
                 </Modal>
               </TableData>
@@ -178,32 +199,34 @@ function Assets() {
                 <img src="/images/pdf-icon.png" alt="icon for pdfs" />
                 <div>Pdfs</div>
               </TC>
-              <Modal>
-                <Modal.Open opens="upload-project-attachment">
-                  <IconContainer>
-                    <StyledBsCloudPlusFill size={"2rem"} color="blue" />
-                    <HoverText>Upload file</HoverText>
-                  </IconContainer>
-                </Modal.Open>
-                <Modal.Window name={"upload-project-attachment"}>
-                  <UploadFile
-                    fileType={"pdf"}
-                    id={data._id}
-                    isLoading={addingAsset}
-                    mutationFn={mutate}
-                  />
-                </Modal.Window>
-              </Modal>
+              {showUploadBtn && (
+                <Modal>
+                  <Modal.Open opens="upload-project-attachment">
+                    <IconContainer>
+                      <StyledBsCloudPlusFill size={"2rem"} color="blue" />
+                      <HoverText>Upload file</HoverText>
+                    </IconContainer>
+                  </Modal.Open>
+                  <Modal.Window name={"upload-project-attachment"}>
+                    <UploadFile
+                      fileType={"pdf"}
+                      id={data._id}
+                      isLoading={addingAsset}
+                      mutationFn={mutate}
+                    />
+                  </Modal.Window>
+                </Modal>
+              )}
             </TableHead>
             {data.pdfs.map((pdf, index) => (
               <TableData key={index}>
                 <StyledLink
-                  to={`http://127.0.0.1:9000/uploads/pdfs/${pdf}`}
+                  to={`${ASSETAPI}/uploads/pdfs/${pdf.location}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                   target="_blank"
                 >
                   <Img src="/images/pdf-placeholder.png" />
-                  <div>{pdf}</div>
+                  <div>{pdf.name}</div>
                 </StyledLink>
 
                 <Modal>
@@ -211,7 +234,15 @@ function Assets() {
                     <MdDelete color="red" size={"2rem"} cursor={"pointer"} />
                   </Modal.Open>
                   <Modal.Window name={"delete-project-attachment"}>
-                    <ConfirmDelete />
+                    <ConfirmDelete
+                      isDeleting={isDeleting}
+                      onConfirmDelete={() =>
+                        onDelete({
+                          id: taskId,
+                          fileName: pdf.location,
+                        })
+                      }
+                    />
                   </Modal.Window>
                 </Modal>
               </TableData>

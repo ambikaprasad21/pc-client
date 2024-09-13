@@ -3,18 +3,35 @@ import { FaFacebookMessenger } from "react-icons/fa";
 import Row from "../ui/Row";
 import Input from "../ui/Input";
 import Button from "../ui/Button";
+import { useMutation } from "@tanstack/react-query";
+import { messageUserFn } from "../services/functions/messageFn";
+import toast from "react-hot-toast";
+import { Textarea } from "../ui/TextArea";
+import SpinnerSm from "../ui/SpinnerSm";
 
-function MessageMember({ onCloseModal }) {
+function MessageMember({ onCloseModal, userId }) {
   const { register, handleSubmit } = useForm();
+
+  const { isLoading, mutate } = useMutation({
+    mutationKey: ["message"],
+    mutationFn: messageUserFn,
+    onSuccess: () => {
+      toast.success("Message sent");
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   function onSubmit(data) {
     console.log(data);
+    mutate({ message: data, receiverId: userId });
   }
   return (
     <div
       style={{
-        padding: "0 2rem",
-        width: "fit-content",
+        // padding: "0 2rem",
+        width: "30rem",
         display: "flex",
         flexDirection: "column",
         gap: "2.4rem",
@@ -23,17 +40,17 @@ function MessageMember({ onCloseModal }) {
     >
       <div
         style={{
-          width: "1rem",
-          height: "1rem",
+          width: "2rem",
+          height: "2rem",
           color: "#3F8EFC",
-          padding: "1.4rem",
+          padding: "2rem",
           borderRadius: "50%",
           backgroundColor: "#E3E9FF",
           position: "relative",
         }}
       >
         <FaFacebookMessenger
-          size={"1.4rem"}
+          size={"2rem"}
           style={{
             position: "absolute",
             top: "50%",
@@ -44,24 +61,32 @@ function MessageMember({ onCloseModal }) {
       </div>
 
       <Row>
-        <p style={{ color: "#7B7979" }}>Enter message</p>
-        <p style={{ color: "#AFAEAE" }}>Provide message below to send</p>
+        <p style={{ color: "#7B7979", fontSize: "1.4rem", fontWeight: "550" }}>
+          Enter message
+        </p>
+        <p style={{ color: "#AFAEAE", fontSize: "1.4rem", fontWeight: "550" }}>
+          Provide message below to send
+        </p>
       </Row>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Row>
           <label htmlFor="message">Message</label>
-          <Input
+          <Textarea
             type="text"
             id="message"
             {...register("message")}
-            placeholder="Message"
+            placeholder="write message here.."
           />
         </Row>
-      </form>
-
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "1rem",
+            marginTop: "1rem",
+          }}
+        >
           <Button
             variation="primary"
             size="medium"
@@ -70,10 +95,10 @@ function MessageMember({ onCloseModal }) {
             Cancel
           </Button>
           <Button variation="secondary" size="medium">
-            Send message
+            {isLoading ? <SpinnerSm /> : "Send message"}
           </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

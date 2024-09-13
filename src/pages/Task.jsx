@@ -17,7 +17,6 @@ function Task() {
     queryKey: ["taskById"],
     queryFn: () => getTaskById(taskId),
   });
-  console.log(data);
   return (
     <Container>
       <nav className={styles.nav}>

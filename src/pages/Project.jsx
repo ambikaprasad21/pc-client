@@ -14,9 +14,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addAssetToProjectFn,
   getProjectById,
+  removeAssetProjectFn,
 } from "../services/functions/projectFn";
 import SpinnerSm from "../ui/SpinnerSm";
 import toast from "react-hot-toast";
+import { ASSETAPI } from "../utility/constant";
 
 const StyledDiv = styled.div`
   /* max-width: 120rem; */
@@ -41,14 +43,14 @@ const Row1 = styled.div`
   margin-bottom: 4rem;
 
   p {
-    font-size: 1.6rem;
-    font-weight: 350;
+    font-size: 2rem;
+    font-weight: 300;
   }
 `;
 
 const Title = styled.div`
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 300;
 `;
 
 const Video = styled.div`
@@ -165,6 +167,18 @@ function Project() {
     },
   });
 
+  const { isLoading: isDeleting, mutate: onDelete } = useMutation({
+    mutationKey: ["projectById"],
+    mutationFn: removeAssetProjectFn,
+    onSuccess: () => {
+      toast.success("File removed successfully.");
+      queryClient.invalidateQueries(["projectById"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
   if (isLoading) return <SpinnerSm />;
   const isAssignedProjects = location.pathname.includes("assigned");
   return (
@@ -193,11 +207,21 @@ function Project() {
       {data && (
         <Row>
           <Row1>
-            <Title>{data.title}</Title>
-            <p>{data.description}</p>
+            <Title>
+              <span style={{ fontSize: "2.4rem", fontWeight: "500" }}>
+                Title:{" "}
+              </span>
+              {data.title}
+            </Title>
+            <p>
+              <span style={{ fontSize: "2.4rem", fontWeight: "500" }}>
+                Description:{" "}
+              </span>
+              {data.description}
+            </p>
             <Video>
               <video
-                src={`http://127.0.0.1:9000/uploads/videos/${data.video}`}
+                src={`${ASSETAPI}/uploads/videos/${data.video}`}
                 controls
                 preload="auto"
                 width="640"
@@ -236,12 +260,12 @@ function Project() {
                 {data.images.map((img, index) => (
                   <TableData key={index}>
                     <StyledLink
-                      to={`http://127.0.0.1:9000/uploads/images/${img}`}
+                      to={`${ASSETAPI}/uploads/images/${img.location}`}
                       style={{ textDecoration: "none", color: "inherit" }}
                       target="_blank"
                     >
                       <Img src={"/images/image-icon.png"} />
-                      <div>{img}</div>
+                      <div>{img.name}</div>
                     </StyledLink>
                     {!isAssignedProjects && (
                       <Modal>
@@ -253,7 +277,15 @@ function Project() {
                           />
                         </Modal.Open>
                         <Modal.Window name={"delete-project-attachment"}>
-                          <ConfirmDelete />
+                          <ConfirmDelete
+                            isDeleting={isDeleting}
+                            onConfirmDelete={() =>
+                              onDelete({
+                                id: projectId,
+                                fileName: img.location,
+                              })
+                            }
+                          />
                         </Modal.Window>
                       </Modal>
                     )}
@@ -289,12 +321,12 @@ function Project() {
                 {data.pdfs.map((pdf, index) => (
                   <TableData key={index}>
                     <StyledLink
-                      to={`http://127.0.0.1:9000/uploads/pdfs/${pdf}`}
+                      to={`${ASSETAPI}/uploads/pdfs/${pdf.location}`}
                       style={{ textDecoration: "none", color: "inherit" }}
                       target="_blank"
                     >
                       <Img src="/images/pdf-placeholder.png" />
-                      <div>{pdf}</div>
+                      <div>{pdf.name}</div>
                     </StyledLink>
 
                     {!isAssignedProjects && (
@@ -307,7 +339,15 @@ function Project() {
                           />
                         </Modal.Open>
                         <Modal.Window name={"delete-project-attachment"}>
-                          <ConfirmDelete />
+                          <ConfirmDelete
+                            isDeleting={isDeleting}
+                            onConfirmDelete={() =>
+                              onDelete({
+                                id: projectId,
+                                fileName: pdf.location,
+                              })
+                            }
+                          />
                         </Modal.Window>
                       </Modal>
                     )}

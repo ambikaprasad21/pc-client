@@ -65,7 +65,7 @@ export async function deleteTaskFn(taskId) {
   }
 
   const data = await res.json();
-  return data.data;
+  return data;
 }
 
 export async function addAssetToTaskFn({ id: taskId, formData }) {
@@ -76,6 +76,68 @@ export async function addAssetToTaskFn({ id: taskId, formData }) {
     body: formData,
     headers: {
       Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (res.status !== 200) {
+    const data = await res.json();
+    throw new Error(data.message);
+  }
+
+  const data = await res.json();
+  return data.data;
+}
+
+export async function removeAssetTaskFn({ id: taskId, fileName }) {
+  const token = localStorage.getItem("prozverify");
+  // console.log(formData, taskId);
+  const res = await fetch(
+    `${API}/task/delete-task-asset/${taskId}/${fileName}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (res.status !== 200) {
+    const data = await res.json();
+    throw new Error(data.message);
+  }
+
+  const data = await res.json();
+  return data.message;
+}
+
+export async function editTaskFn({ taskId, newData }) {
+  const token = localStorage.getItem("prozverify");
+  // console.log(formData, projectId);
+  const res = await fetch(`${API}/task/update-task/${taskId}`, {
+    method: "PATCH",
+    body: JSON.stringify(newData),
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (res.status !== 200) {
+    const data = await res.json();
+    throw new Error(data.message);
+  }
+
+  const data = await res.json();
+  return data.data;
+}
+
+export async function markTaskCompletedFn(taskId) {
+  const token = localStorage.getItem("prozverify");
+  const res = await fetch(`${API}/task/toggle-marked/${taskId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     },
   });
 

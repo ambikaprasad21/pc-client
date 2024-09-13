@@ -5,7 +5,7 @@ import LazyImage from "./../utility/LazyImage";
 import styles from "./LandingPage.module.css";
 import Footer from "../components/Footer";
 import { UserContext } from "../context/UserContext";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { API } from "../utility/constant";
 import SpinnerSm from "../ui/SpinnerSm";
@@ -49,7 +49,9 @@ function Hero() {
           </p>
         </div>
         <div>
-          <button>Start free trial</button>
+          <NavLink to={"/auth/login"}>
+            <button>Start free trial</button>
+          </NavLink>
         </div>
       </div>
       <div className={styles["img-container"]}>
@@ -555,6 +557,13 @@ function Pricing() {
             </button>
           </div>
         </div>
+      </div>
+      <div className={styles["pricing-note"]}>
+        <p>
+          Note: Currently, all users are receiving the benefits of the Advanced
+          Plan as our payment system is in test mode. However, project creation
+          is limited to 2 projects only.
+        </p>
       </div>
     </div>
   );

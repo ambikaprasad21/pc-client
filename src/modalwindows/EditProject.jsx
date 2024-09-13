@@ -4,38 +4,65 @@ import Row from "../ui/Row";
 import { FaDiceD6 } from "react-icons/fa";
 import { Textarea } from "../ui/TextArea";
 import Input from "../ui/Input";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { editProjectFn } from "../services/functions/projectFn";
+import toast from "react-hot-toast";
+import SpinnerSm from "../ui/SpinnerSm";
 
-function EditProject({ onCloseModal }) {
-  const { register, handleSubmit } = useForm();
+function EditProject({ data, onCloseModal }) {
+  const project = {
+    ...data,
+    deadline: data.deadline
+      ? new Date(data.deadline).toISOString().split("T")[0]
+      : "",
+  };
+  const { id: projectId, ...projectValues } = project;
+  const { register, handleSubmit } = useForm({
+    defaultValues: projectValues,
+  });
 
-  function onSubmit(data) {
-    console.log(data);
+  const queryClient = useQueryClient();
+
+  const { isLoading: updating, mutate } = useMutation({
+    mutationKey: ["projects"],
+    mutationFn: editProjectFn,
+    onSuccess: () => {
+      toast.success("Project upated successfully");
+      queryClient.invalidateQueries(["projects"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  function onSubmit(newData) {
+    mutate({ projectId, newData });
   }
 
   return (
     <div
       style={{
-        padding: "0 2rem",
-        width: "fit-content",
+        // padding: "0 2rem",
         display: "flex",
         flexDirection: "column",
         gap: "2.4rem",
         justifyContent: "flex-start",
+        width: "40rem",
       }}
     >
       <div
         style={{
-          width: "1rem",
-          height: "1rem",
+          width: "2rem",
+          height: "2rem",
           color: "#3F8EFC",
-          padding: "1.4rem",
+          padding: "2rem",
           borderRadius: "50%",
           backgroundColor: "#E3E9FF",
           position: "relative",
         }}
       >
         <FaDiceD6
-          size={"1.4rem"}
+          size={"2rem"}
           style={{
             position: "absolute",
             top: "50%",
@@ -46,8 +73,12 @@ function EditProject({ onCloseModal }) {
       </div>
 
       <Row>
-        <p style={{ color: "#7B7979" }}>Edit project details</p>
-        <p style={{ color: "#AFAEAE" }}>Enter new details for this project</p>
+        <p style={{ color: "#7B7979", fontSize: "1.4rem", fontWeight: "550" }}>
+          Edit project details
+        </p>
+        <p style={{ color: "#AFAEAE", fontSize: "1.2rem", fontWeight: "500" }}>
+          Enter new details for this project
+        </p>
       </Row>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Row>
@@ -68,8 +99,24 @@ function EditProject({ onCloseModal }) {
             placeholder="Project description"
           />
         </Row>
+        <Row>
+          <label htmlFor="date">Deadline</label>
+          <Input
+            type="date"
+            id="deadline"
+            {...register("deadline")}
+            placeholder="YYYY-MM-DD"
+          />
+        </Row>
 
-        <div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            gap: "1rem",
+            marginTop: "1rem",
+          }}
+        >
           <Button
             variation="primary"
             size="medium"
@@ -79,7 +126,7 @@ function EditProject({ onCloseModal }) {
             Cancel
           </Button>
           <Button variation="secondary" size="medium">
-            Edit project
+            {updating ? <SpinnerSm /> : "Edit project"}
           </Button>
         </div>
       </form>

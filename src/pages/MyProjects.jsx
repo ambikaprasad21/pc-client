@@ -10,10 +10,14 @@ import projectData from "./../data/projectData";
 import Modal from "../ui/Modal";
 import CreateProject from "../modalwindows/CreateProject";
 import EditProject from "./../modalwindows/EditProject";
-import { getAllProjects } from "../services/functions/projectFn";
-import { useQuery } from "@tanstack/react-query";
+import {
+  getAllProjects,
+  moveProjectToTrashFn,
+} from "../services/functions/projectFn";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import SpinnerSm from "../ui/SpinnerSm";
 import { formatDate } from "../utility/formatDate";
+import toast from "react-hot-toast";
 
 const StyledDiv = styled.div`
   max-width: 120rem;
@@ -119,7 +123,8 @@ const Menu = styled.div`
   border-radius: 8px;
   width: 12rem;
   overflow: hidden;
-  opacity: ${(props) => (props.show ? 1 : 0)};
+  display: ${(props) => (props.show ? "block" : "none")};
+  /* opacity: ${(props) => (props.show ? 1 : 0)}; */
   transform: ${(props) => (props.show ? "translateY(0)" : "translateY(-10px)")};
   transition: opacity 0.2s ease, transform 0.2s ease;
   z-index: 1;
@@ -156,9 +161,19 @@ function MyProjects() {
     queryFn: getAllProjects,
   });
 
-  // useEffect(() => {
-  //   setProjects(data);
-  // }, [data]);
+  const queryClient = useQueryClient();
+
+  const { isLoading: isTrashing, mutate: moveToTrash } = useMutation({
+    mutationKey: ["projects"],
+    mutationFn: moveProjectToTrashFn,
+    onSuccess: () => {
+      toast.success("Project moved to trash.");
+      queryClient.invalidateQueries(["projects"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   const toggleMenu = (id, event) => {
     event.stopPropagation();
@@ -212,14 +227,27 @@ function MyProjects() {
                 ref={menuRef}
               >
                 <BsThreeDotsVertical />
-                <Menu show={showMenu === el.id}>
-                  <MenuItem>Move to trash</MenuItem>
+                <Menu
+                  show={showMenu === el.id}
+                  ref={showMenu === el.id ? menuRef : null}
+                >
+                  <MenuItem
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      moveToTrash(el.id);
+                    }}
+                  >
+                    {isTrashing ? "Move to trash..." : "Move to trash"}
+                  </MenuItem>
                   <Modal>
-                    <Modal.Open opens="edit-project">
+                    <Modal.Open
+                      opens="edit-project"
+                      onClick={(event) => event.stopPropagation()}
+                    >
                       <MenuItem>Edit project</MenuItem>
                     </Modal.Open>
                     <Modal.Window name={"edit-project"}>
-                      <EditProject />
+                      <EditProject data={el} />
                     </Modal.Window>
                   </Modal>
                 </Menu>

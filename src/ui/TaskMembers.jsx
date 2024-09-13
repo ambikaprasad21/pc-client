@@ -3,13 +3,14 @@ import { useParams } from "react-router-dom";
 import taskData from "./../data/taskData";
 import Avatar from "../components/Avatar";
 import styled from "styled-components";
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { BsThreeDotsVertical, BsCheckCircleFill } from "react-icons/bs";
 import Row from "./Row";
 import Modal from "./Modal";
 import MessageMember from "../modalwindows/MessageMember";
 import { useQuery } from "@tanstack/react-query";
 import SpinnerSm from "./SpinnerSm";
-
+import { getTaskById } from "../services/functions/taskFn";
+import { useUser } from "../context/UserContext";
 const StyledDiv = styled.div`
   display: flex;
   gap: 2.4rem;
@@ -54,7 +55,8 @@ const Menu = styled.div`
   border-radius: 8px;
   width: 12rem;
   overflow: hidden;
-  opacity: ${(props) => (props.show ? 1 : 0)};
+  /* opacity: ${(props) => (props.show ? 1 : 0)}; */
+  display: ${(props) => (props.show ? "block" : "none")};
   transform: ${(props) => (props.show ? "translateY(0)" : "translateY(-10px)")};
   transition: opacity 0.2s ease, transform 0.2s ease;
   z-index: 1;
@@ -88,6 +90,9 @@ const NameMail = styled.div`
 const Name = styled.div`
   font-size: 2rem;
   color: #535f75;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 `;
 const Email = styled.div`
   font-size: 1.4rem;
@@ -129,7 +134,7 @@ const Label = styled.div`
   color: #cdcdd4;
 `;
 function TaskMembers() {
-  const [members, setMembers] = useState([]);
+  const { user } = useUser();
   const [showMenu, setShowMenu] = useState(null);
   const menuRef = useRef(null);
 
@@ -166,6 +171,7 @@ function TaskMembers() {
   // }, [tid]);
 
   if (isLoading) return <SpinnerSm />;
+  const showDeleteBtn = data && user.projectsCreated.includes(data.projectId);
   return (
     <StyledDiv>
       {data &&
@@ -176,19 +182,23 @@ function TaskMembers() {
               ref={menuRef}
             >
               <BsThreeDotsVertical size={"1.4rem"} />
-              <Menu show={showMenu === member._id}>
+              <Menu
+                show={showMenu === member._id}
+                ref={showMenu === member._id ? menuRef : null}
+              >
                 <Modal>
                   <Modal.Open opens="upload-pp">
                     <MenuItem>Message</MenuItem>
                   </Modal.Open>
                   <Modal.Window name={"upload-pp"}>
-                    <MessageMember />
+                    <MessageMember userId={member.member.user._id} />
                   </Modal.Window>
                 </Modal>
 
-                <MenuItem>Delete</MenuItem>
+                {showDeleteBtn && <MenuItem>Delete</MenuItem>}
               </Menu>
             </IconWrapper>
+
             <Details>
               <Avatar
                 src={member.member.user?.photo}
@@ -196,15 +206,14 @@ function TaskMembers() {
                 size={"medium"}
               />
               <NameMail>
-                <Name>{`${member.member.user.firstName} ${member.member.user.lastName}`}</Name>
+                <Name>
+                  {`${member.member.user.firstName} ${member.member.user.lastName}`}{" "}
+                  {member.marked && <BsCheckCircleFill color="green" />}
+                </Name>
                 <Email>{member.member.user.email}</Email>
               </NameMail>
               <Row>
-                <About>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Quisquam adipisci aliquam animi officiis neque ducimus
-                  voluptatem debitis facilis modi.
-                </About>
+                <About>{member.member.user.bio}</About>
                 {/* <Experience>
                   <NumLab>
                     <Number>{member.projects}</Number>

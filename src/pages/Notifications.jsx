@@ -93,7 +93,7 @@ function Notifications() {
   const { isLoading: markLoading, mutate: markMutate } = useMutation({
     mutationKey: ["notification"],
     mutationFn: markNotificationSeen,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Marked as seen");
       queryClient.invalidateQueries(["notification"]);
     },
@@ -105,7 +105,7 @@ function Notifications() {
   const { isLoading: loadingDelete, mutate: deleteMutate } = useMutation({
     mutationKey: ["notification"],
     mutationFn: deleteNotification,
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Notification deleted successfully.");
       queryClient.invalidateQueries(["notification"]);
     },

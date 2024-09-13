@@ -4,36 +4,15 @@ import Button from "../ui/Button";
 import { BsBellFill } from "react-icons/bs";
 import styled from "styled-components";
 import Avatar from "../components/Avatar";
-const messagesData = [
-  {
-    id: 1,
-    time: "12:00 AM",
-    text: "To increase the distance between each dash in a dashed border, you can use the border-style property with the border-width and border-color properties alongside the border-image property for more precise control.",
-    photo: "/images/z.jpg",
-    senderName: "John Doe",
-  },
-  {
-    id: 2,
-    time: "12:00 AM",
-    text: "To increase the distance between each dash in a dashed border, you can use the border-style property with the border-width and border-color properties alongside the border-image property for more precise control.",
-    photo: "/images/z.jpg",
-    senderName: "John Doe",
-  },
-  {
-    id: 3,
-    time: "12:00 AM",
-    text: "To increase the distance between each dash in a dashed border, you can use the border-style property with the border-width and border-color properties alongside the border-image property for more precise control.",
-    photo: "/images/z.jpg",
-    senderName: "John Doe",
-  },
-  {
-    id: 4,
-    time: "12:00 AM",
-    text: "To increase the distance between each dash in a dashed border, you can use the border-style property with the border-width and border-color properties alongside the border-image property for more precise control.",
-    photo: "/images/z.jpg",
-    senderName: "John Doe",
-  },
-];
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  deleteAllMessageFn,
+  deleteMessageFn,
+  getAllMessageFn,
+  markMessageReadFn,
+} from "../services/functions/messageFn";
+import SpinnerSm from "../ui/SpinnerSm";
+import toast from "react-hot-toast";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -88,31 +67,109 @@ const Message = styled.p`
   color: #5c5c5c;
 `;
 
+const NoMessages = styled.p`
+  font-size: 2rem;
+  font-weight: 500;
+`;
+
 function Messages() {
+  const { data: messagesData, isLoading } = useQuery({
+    queryKey: ["messages"],
+    queryFn: getAllMessageFn,
+  });
+
+  console.log(messagesData);
+
+  const queryClient = useQueryClient();
+
+  const { isLoading: isMarking, mutate: markeMessageRead } = useMutation({
+    mutationKey: ["messages"],
+    mutationFn: markMessageReadFn,
+    onSuccess: () => {
+      toast.success("Message marked as read.");
+      queryClient.invalidateQueries(["messages"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const { isLoading: deleting, mutate: deleteMessage } = useMutation({
+    mutationKey: ["messages"],
+    mutationFn: deleteMessageFn,
+    onSuccess: () => {
+      toast.success("Message deleted.");
+      queryClient.invalidateQueries(["messages"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  const { isLoading: deletingAll, mutate: deleteAllMessage } = useMutation({
+    mutationKey: ["messages"],
+    mutationFn: deleteAllMessageFn,
+    onSuccess: () => {
+      toast.success("All messages deleted.");
+      queryClient.invalidateQueries(["messages"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  if (isLoading) return <SpinnerSm />;
+
+  if (messagesData && messagesData.length === 0)
+    return (
+      <NoMessages>There are no new messages for you right now.</NoMessages>
+    );
+
   return (
     <StyledDiv>
-      <DeleteAll>
-        <Button size="small" variation="danger">
-          Delete all
-        </Button>
-      </DeleteAll>
+      {messagesData.length > 0 && (
+        <DeleteAll>
+          <Button
+            size="small"
+            variation="danger"
+            onClick={() => deleteAllMessage()}
+          >
+            Delete all
+          </Button>
+        </DeleteAll>
+      )}
 
       <div>
         {messagesData.map((el) => (
           <ContainerItems key={el.id}>
             <div>
-              <Avatar src={`${el.photo}`} size={"small"} name={`${el.name}`} />
+              <Avatar
+                src={el.sender?.photo}
+                name={`${el.sender.firstName} ${el.sender.lastName}`}
+                size={"small"}
+              />
             </div>
 
             <Content>
-              <SenderName>{el.senderName}</SenderName>
-              <Message>{el.text}</Message>
+              <SenderName>
+                {`${el.sender.firstName} ${el.sender.lastName}`}
+                <span style={{ color: "#b0b0b0" }}>{el.sender.email}</span>
+              </SenderName>
+              <Message>{el.message}</Message>
               <div>
-                <Button variation="danger" size="small">
+                <Button
+                  variation="danger"
+                  size="small"
+                  onClick={() => deleteMessage(el._id)}
+                >
                   Delete
                 </Button>
                 <span></span>
-                <Button variation="secondary" size="small">
+                <Button
+                  variation="secondary"
+                  size="small"
+                  onClick={() => markeMessageRead(el._id)}
+                >
                   Mark as read
                 </Button>
               </div>

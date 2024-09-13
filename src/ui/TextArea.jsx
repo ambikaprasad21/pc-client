@@ -4,7 +4,7 @@ export const Textarea = styled.textarea`
   padding: 0.8rem 1.2rem;
   border: 2px solid #e3e7eb;
   background-color: #f8f9fa;
-  color: #b7babf;
+  color: black;
   /* box-shadow: var(--shadow-sm); */
   width: 100%;
   height: 8rem;

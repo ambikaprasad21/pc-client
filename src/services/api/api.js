@@ -35,6 +35,7 @@ export const changePasswordApi = async (data, token) => {
 };
 
 export const uploadPPApi = async (data, token) => {
+  console.log(data, token);
   return await base_url.post(`/user/upload/profile-picture`, data, {
     headers: {
       Authorization: `Bearer ${token}`,

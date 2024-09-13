@@ -48,6 +48,14 @@ const variations = {
       background-color: #f60515;
     }
   `,
+  marked: css`
+    color: #fff;
+    background-color: #6cf820;
+
+    &:hover {
+      background-color: #15f605;
+    }
+  `,
 };
 
 const Button = styled.button`

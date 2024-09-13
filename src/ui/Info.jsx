@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import Button from "./Button";
-import { useQuery } from "@tanstack/react-query";
-import { getTaskById } from "../services/functions/taskFn";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getTaskById, markTaskCompletedFn } from "../services/functions/taskFn";
 import SpinnerSm from "./SpinnerSm";
 import { formatDate } from "../utility/formatDate";
+import { useUser } from "../context/UserContext";
+import toast from "react-hot-toast";
 
 const StyledDiv = styled.div`
   display: flex;
@@ -21,11 +23,11 @@ const TitleDesc = styled.div`
 
   div {
     font-size: 2rem;
-    font-weight: 500;
+    font-weight: 300;
   }
 
   p {
-    font-size: 1.6rem;
+    font-size: 2rem;
     font-weight: 300;
   }
 `;
@@ -62,7 +64,7 @@ const Deadline = styled.div`
 `;
 
 function Info() {
-  const [task, setTask] = useState(null);
+  const { user } = useUser();
 
   const { taskId } = useParams();
   const { data, isLoading } = useQuery({
@@ -70,17 +72,44 @@ function Info() {
     queryFn: () => getTaskById(taskId),
   });
 
-  // useEffect(() => {
-  //   setTask(taskData.filter((el) => el.id === +tid));
-  // }, [tid]);
+  const queryClient = useQueryClient();
+  const { isLoading: isMarking, mutate } = useMutation({
+    mutationKey: ["taskById"],
+    mutationFn: markTaskCompletedFn,
+    onSuccess: () => {
+      toast.success("Task marked.");
+      queryClient.invalidateQueries(["taskById"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
 
   if (isLoading) return <SpinnerSm />;
+
+  const isMember = data.taskMembers.some(
+    (member) => member.member.user._id === user._id
+  );
+
+  const memberDetail = data.taskMembers.find(
+    (member) => member.member.user._id === user._id
+  );
+
+  const isMarked = memberDetail ? memberDetail.marked : false;
 
   return (
     <StyledDiv>
       <TitleDesc>
-        <div>{data.title}</div>
-        <p>{data.description}</p>
+        <div>
+          <span style={{ fontSize: "2.4rem", fontWeight: "500" }}>Title: </span>
+          {data.title}
+        </div>
+        <p>
+          <span style={{ fontSize: "2.4rem", fontWeight: "500" }}>
+            Description:{" "}
+          </span>
+          {data.description}
+        </p>
       </TitleDesc>
       <Important>
         <Deadline>
@@ -88,9 +117,19 @@ function Info() {
           <time>{formatDate(data.deadline)}</time>
         </Deadline>
         <div>
-          <Button variation="secondary" size="medium">
-            Mark as completed
-          </Button>
+          {isMember && (
+            <Button
+              variation={isMarked ? "marked" : "secondary"}
+              size="medium"
+              disabled={isMarking}
+              onClick={() => mutate(taskId)}
+            >
+              {isMarked && !isMarking
+                ? "Already Completed"
+                : "Mark as Completed"}
+              {isMarking && <SpinnerSm />}
+            </Button>
+          )}
         </div>
       </Important>
     </StyledDiv>

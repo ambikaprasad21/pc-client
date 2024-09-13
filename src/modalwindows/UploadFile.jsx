@@ -6,6 +6,7 @@ import { FaFileUpload, FaCloudUploadAlt } from "react-icons/fa";
 import styled from "styled-components";
 import Button from "../ui/Button";
 import SpinnerSm from "../ui/SpinnerSm";
+import toast from "react-hot-toast";
 
 const File = styled.div`
   cursor: pointer;
@@ -57,11 +58,13 @@ function UploadFile({ fileType, onCloseModal, id, isLoading, mutationFn }) {
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
+    console.log(file);
     if (validateFileType(file)) {
       setValue("file", file);
       setFileErrors((prev) => ({ ...prev, [fileType]: false }));
       setSelectedFileName(file.name);
     } else {
+      toast.error("Invalid file type.");
       setValue("file", null);
       setFileErrors((prev) => ({ ...prev, [fileType]: true }));
       setSelectedFileName("");
@@ -70,6 +73,7 @@ function UploadFile({ fileType, onCloseModal, id, isLoading, mutationFn }) {
 
   function onSubmit(newData) {
     console.log(newData, id);
+    if (newData.file === null) return;
     const formData = new FormData();
     if (newData.file) {
       formData.append(fileType, newData.file);

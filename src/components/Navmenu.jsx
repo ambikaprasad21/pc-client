@@ -26,7 +26,7 @@ function Navmenu() {
           </ScrollLink>
         </li>
         <li>
-          <NavLink to={"/articles"}>Articles</NavLink>
+          <NavLink to={"/"}>Articles</NavLink>
         </li>
         <li>
           <ScrollLink to="pricing" spy={true} smooth={true} className="mouse">
