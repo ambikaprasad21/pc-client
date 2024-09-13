@@ -39,7 +39,7 @@ function AddMember({ onCloseModal }) {
     <div
       style={{
         // padding: "0 1.4rem",
-        width: "fit-content",
+        width: "30rem",
         display: "flex",
         flexDirection: "column",
         gap: "2.4rem",

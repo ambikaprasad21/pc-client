@@ -1,6 +1,7 @@
 import Button from "./../ui/Button";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 // import memberData from "./../data/memberData";
 import Avatar from "./../components/Avatar";
 import Row from "./../ui/Row";
@@ -196,11 +197,7 @@ function Members() {
 
                   <Modal>
                     <Modal.Open opens="upload-pp">
-                      <FaTrashAlt
-                        color="#D70000"
-                        size={"1.6rem"}
-                        cursor="pointer"
-                      />
+                      <MdDelete color="red" size="2rem" cursor="pointer" />
                     </Modal.Open>
                     <Modal.Window name={"upload-pp"}>
                       <ConfirmDelete

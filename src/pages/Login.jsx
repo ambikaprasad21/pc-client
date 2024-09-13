@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import { API, APIHEADER } from "../utility/constant";
 import { UserContext } from "../context/UserContext";
 import SpinnerSm from "../ui/SpinnerSm";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 
 const Error = styled.span`
   font-size: 1rem;
@@ -16,8 +17,25 @@ const Error = styled.span`
   color: #d71e1e;
 `;
 
+const PasswordInput = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  input {
+    flex-grow: 1;
+  }
+
+  span {
+    position: absolute;
+    right: 1rem;
+    z-index: 10;
+  }
+`;
+
 function Login() {
   const [loader, setLoader] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const navigate = useNavigate();
   const { register, handleSubmit, formState, watch } = useForm();
   const { errors } = formState;
@@ -122,14 +140,23 @@ function Login() {
                   )}
                 </Row>
                 <Row gap="5px">
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    id="password"
-                    {...register("password", {
-                      required: "This field is required.",
-                    })}
-                  />
+                  <PasswordInput>
+                    <input
+                      type={isVisible ? "text" : "password"}
+                      placeholder="Password"
+                      id="password"
+                      {...register("password", {
+                        required: "This field is required.",
+                      })}
+                    />
+                    <span onClick={() => setIsVisible((prev) => !prev)}>
+                      {isVisible ? (
+                        <MdVisibility size="2rem" color="#797979" />
+                      ) : (
+                        <MdVisibilityOff size="2rem" color="#797979" />
+                      )}
+                    </span>
+                  </PasswordInput>
                   {errors?.password?.message && (
                     <Error>{errors.password.message}</Error>
                   )}

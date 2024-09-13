@@ -23,6 +23,7 @@ import {
   MdDynamicFeed,
   MdLan,
 } from "react-icons/md";
+import { FaTrashAlt } from "react-icons/fa";
 
 // import { MdRestore } from "react-icons/md";
 
@@ -110,7 +111,7 @@ function MainNav() {
         </li>
         <li>
           <StyledNavLink to="/trash">
-            <MdDelete />
+            <FaTrashAlt />
             <span>Trash</span>
           </StyledNavLink>
         </li>
