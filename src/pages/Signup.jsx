@@ -8,6 +8,7 @@ import Row from "./../ui/Row";
 import { API } from "../utility/constant";
 import SpinnerSm from "../ui/SpinnerSm";
 import toast from "react-hot-toast";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
 
 const Error = styled.span`
   font-size: 1rem;
@@ -15,9 +16,26 @@ const Error = styled.span`
   color: #d71e1e;
 `;
 
+const PasswordInput = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: relative;
+  input {
+    flex-grow: 1;
+  }
+
+  span {
+    position: absolute;
+    right: 1rem;
+    z-index: 10;
+  }
+`;
+
 function Signup() {
   const navigate = useNavigate();
   const [loader, setLoader] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const { register, handleSubmit, getValues, formState, watch } = useForm();
   const { errors } = formState;
 
@@ -167,18 +185,28 @@ function Signup() {
               </Row>
 
               <Row gap="5px">
-                <input
-                  type="text"
-                  placeholder="Password"
-                  id="password"
-                  {...register("password", {
-                    required: "This field is required.",
-                    max: {
-                      value: 8,
-                      message: "password must be more than 7 characters.",
-                    },
-                  })}
-                />
+                <PasswordInput>
+                  <input
+                    type={isVisible ? "text" : "password"}
+                    placeholder="Password"
+                    id="password"
+                    {...register("password", {
+                      required: "This field is required.",
+                      max: {
+                        value: 8,
+                        message: "password must be more than 7 characters.",
+                      },
+                    })}
+                  />
+                  <span onClick={() => setIsVisible((prev) => !prev)}>
+                    {isVisible ? (
+                      <MdVisibility size="2rem" color="#797979" />
+                    ) : (
+                      <MdVisibilityOff size="2rem" color="#797979" />
+                    )}
+                  </span>
+                </PasswordInput>
+
                 {errors?.password?.message && (
                   <Error>{errors.password.message}</Error>
                 )}
@@ -186,7 +214,7 @@ function Signup() {
 
               <Row gap="5px">
                 <input
-                  type="text"
+                  type="password"
                   placeholder="Confirm password"
                   id="confirmPassword"
                   {...register("confirmPassword", {
