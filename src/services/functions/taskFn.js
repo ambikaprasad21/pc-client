@@ -32,6 +32,7 @@ export async function getTaskById(taskId) {
 
 export async function createTaskFn({ id: projectId, formData }) {
   const token = localStorage.getItem("prozverify");
+  console.log(formData);
   const res = await fetch(`${API}/task/${projectId}/new/task`, {
     method: "POST",
     body: formData,

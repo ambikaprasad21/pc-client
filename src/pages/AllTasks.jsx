@@ -384,7 +384,7 @@ function AllTasks() {
                 {task.taskMembers.slice(0, 3).map((item) => (
                   <Avatar
                     src={item.member.user?.photo}
-                    key={item.id}
+                    key={item.member.user._id}
                     name={`${item.member.user.firstName} ${item.member.user.lastName}`}
                     size={"small"}
                   />

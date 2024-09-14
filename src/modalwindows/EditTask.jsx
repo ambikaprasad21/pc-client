@@ -10,6 +10,13 @@ import { editProjectFn } from "../services/functions/projectFn";
 import toast from "react-hot-toast";
 import SpinnerSm from "../ui/SpinnerSm";
 import { editTaskFn } from "../services/functions/taskFn";
+import styled from "styled-components";
+
+const Error = styled.span`
+  font-size: 1rem;
+  padding: 0 5px;
+  color: #d71e1e;
+`;
 
 function EditTask({ data, onCloseModal }) {
   const task = {
@@ -20,9 +27,11 @@ function EditTask({ data, onCloseModal }) {
     priority: { value: data.priorityLevel, label: data.priorityLevel },
   };
   const { _id: taskId, ...taskValues } = task;
-  const { register, handleSubmit, control } = useForm({
+  const { register, handleSubmit, control, formState } = useForm({
     defaultValues: taskValues,
   });
+
+  const { errors } = formState;
 
   const queryClient = useQueryClient();
 
@@ -95,27 +104,36 @@ function EditTask({ data, onCloseModal }) {
           <Input
             type="text"
             id="title"
-            {...register("title")}
+            {...register("title", { required: "This field is required." })}
             placeholder="Project title"
           />
+          {errors?.title?.message && <Error>{errors.title.message}</Error>}
         </Row>
         <Row>
           <label htmlFor="description">Description</label>
           <Textarea
             type="text"
             id="description"
-            {...register("description")}
+            {...register("description", {
+              required: "This field is required.",
+            })}
             placeholder="Project description"
           />
+          {errors?.description?.message && (
+            <Error>{errors.description.message}</Error>
+          )}
         </Row>
         <Row>
           <label htmlFor="date">Deadline</label>
           <Input
             type="date"
             id="deadline"
-            {...register("deadline")}
+            {...register("deadline", { required: "This field is required." })}
             placeholder="YYYY-MM-DD"
           />
+          {errors?.deadline?.message && (
+            <Error>{errors.deadline.message}</Error>
+          )}
         </Row>
         <Row>
           <label htmlFor="taskPriority">Priority</label>

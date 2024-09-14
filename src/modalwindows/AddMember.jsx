@@ -7,9 +7,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addMemberFn } from "../services/functions/memberFn";
 import toast from "react-hot-toast";
 import SpinnerSm from "../ui/SpinnerSm";
+import styled from "styled-components";
+
+const Error = styled.span`
+  font-size: 1rem;
+  padding: 0 5px;
+  color: #d71e1e;
+`;
 
 function AddMember({ onCloseModal }) {
   const { register, handleSubmit, formState } = useForm();
+  const { errors } = formState;
   const queryClient = useQueryClient();
 
   const { isLoading, mutate } = useMutation({
@@ -23,8 +31,6 @@ function AddMember({ onCloseModal }) {
       toast.error(err.message);
     },
   });
-
-  const { errors } = formState;
 
   function onSubmit(data) {
     console.log(data);
@@ -91,6 +97,7 @@ function AddMember({ onCloseModal }) {
             })}
             placeholder="johndoe@gmail.com"
           />
+          {errors?.email?.message && <Error>{errors.email.message}</Error>}
         </Row>
         <Row>
           <label htmlFor="title">Title</label>
@@ -106,6 +113,7 @@ function AddMember({ onCloseModal }) {
             })}
             placeholder="Frontend Engineer"
           />
+          {errors?.title?.message && <Error>{errors.title.message}</Error>}
         </Row>
         <Row>
           <label htmlFor="role">Role</label>
@@ -121,6 +129,7 @@ function AddMember({ onCloseModal }) {
             })}
             placeholder="UI Designer"
           />
+          {errors?.role?.message && <Error>{errors.role.message}</Error>}
         </Row>
         <div
           style={{

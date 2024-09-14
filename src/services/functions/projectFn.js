@@ -47,6 +47,7 @@ export async function getProjectById(id) {
 
 export async function createProjectFn(formData) {
   const token = localStorage.getItem("prozverify");
+  console.log(formData);
   const res = await fetch(`${API}/project/create/new`, {
     method: "POST",
     body: formData,

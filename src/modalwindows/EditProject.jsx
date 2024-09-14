@@ -8,6 +8,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { editProjectFn } from "../services/functions/projectFn";
 import toast from "react-hot-toast";
 import SpinnerSm from "../ui/SpinnerSm";
+import styled from "styled-components";
+
+const Error = styled.span`
+  font-size: 1rem;
+  padding: 0 5px;
+  color: #d71e1e;
+`;
 
 function EditProject({ data, onCloseModal }) {
   const project = {
@@ -17,9 +24,10 @@ function EditProject({ data, onCloseModal }) {
       : "",
   };
   const { id: projectId, ...projectValues } = project;
-  const { register, handleSubmit } = useForm({
+  const { register, handleSubmit, formState } = useForm({
     defaultValues: projectValues,
   });
+  const { errors } = formState;
 
   const queryClient = useQueryClient();
 
@@ -86,27 +94,36 @@ function EditProject({ data, onCloseModal }) {
           <Input
             type="text"
             id="title"
-            {...register("title")}
+            {...register("title", { required: "This field is required." })}
             placeholder="Project title"
           />
+          {errors?.title?.message && <Error>{errors.title.message}</Error>}
         </Row>
         <Row>
           <label htmlFor="description">Description</label>
           <Textarea
             type="text"
             id="description"
-            {...register("description")}
+            {...register("description", {
+              required: "This field is required.",
+            })}
             placeholder="Project description"
           />
+          {errors?.description?.message && (
+            <Error>{errors.description.message}</Error>
+          )}
         </Row>
         <Row>
           <label htmlFor="date">Deadline</label>
           <Input
             type="date"
             id="deadline"
-            {...register("deadline")}
+            {...register("deadline", { required: "This field is required." })}
             placeholder="YYYY-MM-DD"
           />
+          {errors?.deadline?.message && (
+            <Error>{errors.deadline.message}</Error>
+          )}
         </Row>
 
         <div

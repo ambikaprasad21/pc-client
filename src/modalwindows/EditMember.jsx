@@ -7,11 +7,21 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { editMemberFn } from "../services/functions/memberFn";
 import toast from "react-hot-toast";
 import SpinnerSm from "../ui/SpinnerSm";
+import styled from "styled-components";
+
+const Error = styled.span`
+  font-size: 1rem;
+  padding: 0 5px;
+  color: #d71e1e;
+`;
+
 function EditMember({ data, onCloseModal }) {
   const { id: memberId, ...memberDetails } = data;
   const { register, handleSubmit, formState } = useForm({
     defaultValues: memberDetails,
   });
+
+  const { errors } = formState;
 
   const queryClient = useQueryClient();
   const { isLoading, mutate } = useMutation({
@@ -81,6 +91,7 @@ function EditMember({ data, onCloseModal }) {
             {...register("title")}
             placeholder="Frontend Engineer"
           />
+          {errors?.title?.message && <Error>{errors.title.message}</Error>}
         </Row>
         <Row>
           <label htmlFor="role">Role</label>
@@ -90,6 +101,7 @@ function EditMember({ data, onCloseModal }) {
             {...register("role")}
             placeholder="UI Designer"
           />
+          {errors?.role?.message && <Error>{errors.role.message}</Error>}
         </Row>
         <div style={{ marginTop: "1rem", display: "flex", gap: "1rem" }}>
           <Button

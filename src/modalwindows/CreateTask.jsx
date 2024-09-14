@@ -6,6 +6,14 @@ import Input from "../ui/Input";
 import { Textarea } from "../ui/TextArea";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import Select from "react-select";
+import styled from "styled-components";
+import Button from "../ui/Button";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getMemberFn } from "../services/functions/memberFn";
+import { createTaskFn } from "../services/functions/taskFn";
+import toast from "react-hot-toast";
+import SpinnerSm from "../ui/SpinnerSm";
 
 const File = styled.div`
   cursor: pointer;
@@ -26,14 +34,12 @@ const File = styled.div`
   }
 `;
 
-import Select from "react-select";
-import styled from "styled-components";
-import Button from "../ui/Button";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getMemberFn } from "../services/functions/memberFn";
-import { createTaskFn } from "../services/functions/taskFn";
-import toast from "react-hot-toast";
-import SpinnerSm from "../ui/SpinnerSm";
+const Error = styled.span`
+  font-size: 1rem;
+  padding: 0 5px;
+  color: #d71e1e;
+`;
+
 function CreateTask({ onCloseModal, id }) {
   const {
     register,
@@ -131,7 +137,7 @@ function CreateTask({ onCloseModal, id }) {
     <div
       style={{
         // padding: "0 2rem",
-        width: "fit-content",
+        width: "30rem",
         display: "flex",
         flexDirection: "column",
         gap: "2.4rem",
@@ -174,25 +180,37 @@ function CreateTask({ onCloseModal, id }) {
           <Input
             type="text"
             id="title"
-            {...register("title")}
+            {...register("title", {
+              required: "This field is required.",
+              max: {
+                value: 30,
+                message: "Title must be of 30 characters long",
+              },
+            })}
             placeholder="Task title"
           />
+          {errors?.title?.message && <Error>{errors.title.message}</Error>}
         </Row>
         <Row>
           <label htmlFor="description">Description</label>
           <Textarea
             type="text"
             id="description"
-            {...register("description")}
+            {...register("description", {
+              required: "This field is required.",
+            })}
             placeholder="Task description"
           />
+          {errors?.description?.message && (
+            <Error>{errors.description.message}</Error>
+          )}
         </Row>
         <Row>
           <label htmlFor="taskDeadline">Deadline</label>
           <Input
             type="date"
             id="deadline"
-            {...register("deadline")}
+            {...register("deadline", { required: "This field is required." })}
             placeholder="YYYY-MM-DD"
           />
           {errors.deadline && <span>{errors.deadline.message}</span>}

@@ -8,9 +8,17 @@ import { messageUserFn } from "../services/functions/messageFn";
 import toast from "react-hot-toast";
 import { Textarea } from "../ui/TextArea";
 import SpinnerSm from "../ui/SpinnerSm";
+import styled from "styled-components";
+
+const Error = styled.span`
+  font-size: 1rem;
+  padding: 0 5px;
+  color: #d71e1e;
+`;
 
 function MessageMember({ onCloseModal, userId }) {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, formState } = useForm();
+  const { errors } = formState;
 
   const { isLoading, mutate } = useMutation({
     mutationKey: ["message"],
@@ -75,9 +83,10 @@ function MessageMember({ onCloseModal, userId }) {
           <Textarea
             type="text"
             id="message"
-            {...register("message")}
+            {...register("message", { required: "This field is required." })}
             placeholder="write message here.."
           />
+          {errors?.message?.message && <Error>{errors.message.message}</Error>}
         </Row>
         <div
           style={{
