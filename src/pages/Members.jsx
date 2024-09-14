@@ -170,7 +170,7 @@ function Members() {
               <TableData key={member._id}>
                 <div>
                   <Avatar
-                    src={member?.photo}
+                    src={member.user?.photo}
                     name={`${member.user.firstName} ${member.user.lastName}`}
                     size={"medium"}
                   />
