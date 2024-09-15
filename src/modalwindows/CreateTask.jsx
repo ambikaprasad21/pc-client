@@ -254,7 +254,7 @@ function CreateTask({ onCloseModal, id }) {
           {errors.members && <span>{errors.members.message}</span>}
         </div>
 
-        <div style={{ display: "flex", gap: "1rem", padding: "1rem 0" }}>
+        {/* <div style={{ display: "flex", gap: "1rem", padding: "1rem 0" }}>
           <div>
             <input
               type="file"
@@ -303,7 +303,7 @@ function CreateTask({ onCloseModal, id }) {
               </p>
             )}
           </div>
-        </div>
+        </div> */}
 
         <div
           style={{ display: "flex", justifyContent: "flex-end", gap: "1rem" }}
