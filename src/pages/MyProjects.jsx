@@ -234,7 +234,8 @@ function MyProjects() {
                   <MenuItem
                     onClick={(event) => {
                       event.stopPropagation();
-                      moveToTrash(el.id);
+                      // moveToTrash(el.id);
+                      alert("cannot move to trash in demo mode");
                     }}
                   >
                     {isTrashing ? "Move to trash..." : "Move to trash"}
