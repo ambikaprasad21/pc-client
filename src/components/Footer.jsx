@@ -38,10 +38,12 @@ function Footer() {
             <div className={styles["p-l"]}>
               <Link to={"/privacy-policy"}>Privacy policy</Link>
               <Link to={"/terms-of-services"}>Terms of services</Link>
+              <Link to={"/refund-policy"}>Refund policy</Link>
             </div>
             <div className={styles["p-l"]}>
               <p>Contact Us</p>
-              <p className={styles.email}>{EMAIL}</p>
+              <p className={styles.email}>Email: {EMAIL}</p>
+              <p className={styles.email}>Contact number: +91 7905194692</p>
             </div>
           </div>
         </div>

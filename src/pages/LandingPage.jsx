@@ -1,5 +1,7 @@
 import { Suspense, useContext, useEffect, useState } from "react";
 
+import axios from "axios";
+
 import Header from "../components/Header";
 import LazyImage from "./../utility/LazyImage";
 import styles from "./LandingPage.module.css";
@@ -7,8 +9,9 @@ import Footer from "../components/Footer";
 import { UserContext } from "../context/UserContext";
 import { NavLink, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
-import { API } from "../utility/constant";
+import { API, key_razorpay } from "../utility/constant";
 import SpinnerSm from "../ui/SpinnerSm";
+import toast from "react-hot-toast";
 
 function LandingPage() {
   // const { user, setUser } = useContext(UserContext);
@@ -246,59 +249,83 @@ function Pricing() {
   const navigate = useNavigate();
   // prozVerify = localStorage.getItem("prozverify");
 
-  async function handlePurchase(e) {
-    if (!user) {
-      navigate("/auth/login/");
-    } else {
-      const typeOfPurchase = e.target.getAttribute("planType");
-
-      console.log(typeOfPurchase);
-      if (typeOfPurchase === "advanced") {
-        setLoader1(true);
-      } else {
-        setLoader2(true);
-      }
-
-      const stripe = await loadStripe(
-        "pk_test_51PlaJVGdKUuBAw5mkQDtPxwylNK91mJbd4cTpSZGddSH50gMWQUpJ7DYdTmzpKrXQktNS77BqbLgtjKmBnGxfP6Y00ILARHtsJ"
+  async function verifyPayment(data, plantype, typeOfPurchase) {
+    try {
+      const res = await axios.post(
+        `${API}/user/paymentverification`,
+        {
+          data,
+          user,
+          plantype,
+        },
+        { headers: { Authorization: `Bearer ${prozVerify}` } }
       );
 
-      //Calling the backend api
-
-      // remote logo url = https://github.com/ambikaprasad21/pc-client/blob/master/public/images/logo.png
-      try {
-        const res = await fetch(`${API}/user/purchase`, {
-          method: "POST",
-          body: JSON.stringify({
-            type: typeOfPurchase,
-            logo: "https://github.com/ambikaprasad21/pc-client/blob/master/public/images/logo.png",
-          }),
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            authorization: `Bearer ${localStorage.getItem("prozverify")}`,
-          },
-        });
-
-        const session = await res.json();
-        const result = stripe.redirectToCheckout({
-          sessionId: session.id,
-        });
-
-        if (result.error) {
-          console.log(result.error);
+      if (!res.data.status) {
+        toast.error("Payment failed.");
+      } else {
+        if (res.data.redirectUrl) {
+          window.location.href = res.data.redirectUrl;
         }
-      } catch (err) {
-        console.log(err.message);
-      } finally {
-        if (typeOfPurchase === "advanced") {
-          setLoader1(false);
-        } else {
-          setLoader2(false);
-        }
+      }
+    } catch (err) {
+      console.log(err.message);
+    } finally {
+      if (typeOfPurchase === "advanced") {
+        setLoader1(false);
+      } else {
+        setLoader2(false);
       }
     }
   }
+
+  const handlePurchase = async (e) => {
+    const planType = e.target.getAttribute("planType");
+    const typeOfPurchase = e.target.getAttribute("planType");
+    if (typeOfPurchase === "advanced") {
+      setLoader1(true);
+    } else {
+      setLoader2(true);
+    }
+    const {
+      data: { order },
+    } = await axios.post(
+      `${API}/user/checkout`,
+      {
+        planType,
+      },
+      { headers: { Authorization: `Bearer ${prozVerify}` } }
+    );
+
+    const options = {
+      key: key_razorpay,
+      amount: order.amount,
+      currency: "INR",
+      name: "ProzCollab",
+      description: "Subscribing to prozcollab.",
+      image: "https://i.ibb.co/cXnhqVT/logo.png",
+      order_id: order.id,
+      handler: function (response) {
+        verifyPayment(response, planType, typeOfPurchase);
+      },
+      prefill: {
+        name: `${user.firstName} ${user.lastName}`,
+        email: `${user.email}`,
+      },
+      notes: {
+        address: "Razorpay Corporate Office",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    const razor = new window.Razorpay(options);
+    razor.open();
+
+    // console.log(window);
+  };
+
   return (
     <div className={styles.pricing} id="pricing">
       <h1>
@@ -309,7 +336,7 @@ function Pricing() {
           <div className={styles["p-c-info"]}>
             <h2>Free Forever</h2>
             <div className={styles["amount"]}>
-              <span className={styles["currency"]}>$</span>
+              <span className={styles["currency"]}>₹</span>
               <span className={styles["value"]}>0</span>
               <span className={styles["amount-desc"]}>per month</span>
             </div>
@@ -387,8 +414,8 @@ function Pricing() {
           <div className={styles["p-c-info"]}>
             <h2>Advanced</h2>
             <div className={styles["amount"]}>
-              <span className={styles["currency"]}>$</span>
-              <span className={styles["value"]}>35</span>
+              <span className={styles["currency"]}>₹</span>
+              <span className={styles["value"]}>749</span>
               <span className={styles["amount-desc"]}>per month</span>
             </div>
             <div className={styles["p-items"]}>
@@ -474,8 +501,8 @@ function Pricing() {
           <div className={styles["p-c-info"]}>
             <h2>Basic</h2>
             <div className={styles["amount"]}>
-              <span className={styles["currency"]}>$</span>
-              <span className={styles["value"]}>20</span>
+              <span className={styles["currency"]}>₹</span>
+              <span className={styles["value"]}>249</span>
               <span className={styles["amount-desc"]}>per month</span>
             </div>
             <div className={styles["p-items"]}>
@@ -558,13 +585,13 @@ function Pricing() {
           </div>
         </div>
       </div>
-      <div className={styles["pricing-note"]}>
+      {/* <div className={styles["pricing-note"]}>
         <p>
           Note: Currently, all users are receiving the benefits of the Advanced
           Plan as our payment system is in test mode. However, project creation
           is limited to 2 projects only.
         </p>
-      </div>
+      </div> */}
     </div>
   );
 }

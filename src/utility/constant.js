@@ -3,10 +3,12 @@ export const PAGE_SIZE = 5;
 // Local environment
 // export const API = "http://127.0.0.1:9000/pm/api/v1";
 // export const ASSETAPI = "http://127.0.0.1:9000";
+// export const key_razorpay = "rzp_test_CVPlbuW0d6C1ix";
 
 // Render API
 export const API = "https://project-managment-api.onrender.com/pm/api/v1";
 export const ASSETAPI = "https://project-managment-api.onrender.com";
+export const key_razorpay = "rzp_test_CVPlbuW0d6C1ix";
 
 // Vercel API
 // export const API = "https://project-managment-api-gamma.vercel.app/pm/api/v1";

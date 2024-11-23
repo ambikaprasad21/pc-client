@@ -32,6 +32,8 @@ import ApplicationProtect from "./protected/ApplicationProtect";
 import AuthProtect from "./protected/AuthProtect";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import PaymentReceipt from "./components/PaymentReceipt";
+import RefundPolicy from "./pages/RefundPolicy";
 
 const queryClient = new QueryClient();
 
@@ -77,7 +79,7 @@ function App() {
               <Route path="notifications" element={<Notifications />} />
             </Route>
             <Route
-              path="/auth"
+              path="auth"
               element={
                 <AuthProtect>
                   <Auth />
@@ -93,8 +95,10 @@ function App() {
                 element={<ResetPassword />}
               />
             </Route>
+            <Route path="payment/success" element={<PaymentReceipt />} />
             <Route path="privacy-policy" element={<PrivacyPolicy />} />
             <Route path="terms-of-services" element={<TermsOfServices />} />
+            <Route path="refund-policy" element={<RefundPolicy />} />
           </Routes>
         </UserContextProvider>
       </BrowserRouter>

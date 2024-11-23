@@ -35,6 +35,11 @@ export function UserContextProvider({ children }) {
       if (res.status === 200) {
         const data = await res.json();
         setUser(data.data);
+        localStorage.setItem(
+          "name",
+          `${data.data.firstName} ${data.data.lastName}`
+        );
+        localStorage.setItem("email", data.data.email);
         setProzVerify(localStorage.getItem("prozverify"));
       } else {
         const data = await res.json();
@@ -53,6 +58,8 @@ export function UserContextProvider({ children }) {
   function handleLogout() {
     queryClient.clear();
     localStorage.clear("prozverify");
+    localStorage.clear("name");
+    localStorage.clear("email");
     setUser(null);
     navigate("/", { replace: true });
     window.location.reload(true);
