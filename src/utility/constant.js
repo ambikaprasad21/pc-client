@@ -8,7 +8,7 @@ export const PAGE_SIZE = 5;
 // Render API
 export const API = "https://project-managment-api.onrender.com/pm/api/v1";
 export const ASSETAPI = "https://project-managment-api.onrender.com";
-export const key_razorpay = "rzp_test_CVPlbuW0d6C1ix";
+export const key_razorpay = "rzp_live_WjQpTFzEhMVG62";
 
 // Vercel API
 // export const API = "https://project-managment-api-gamma.vercel.app/pm/api/v1";
