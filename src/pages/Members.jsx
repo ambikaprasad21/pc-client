@@ -195,7 +195,7 @@ function Members() {
 
                   <span style={{ padding: "0 1rem" }}></span>
 
-                  {/* <Modal>
+                  <Modal>
                     <Modal.Open opens="upload-pp">
                       <MdDelete color="red" size="2rem" cursor="pointer" />
                     </Modal.Open>
@@ -205,7 +205,7 @@ function Members() {
                         onConfirmDelete={() => mutate(member)}
                       />
                     </Modal.Window>
-                  </Modal> */}
+                  </Modal>
                 </div>
               </TableData>
             ))}
